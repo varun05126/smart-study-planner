@@ -1,0 +1,46 @@
+{% extends "core/base.html" %}
+{% block title %}Tasks | Smart Study Planner{% endblock %}
+
+{% block content %}
+<h2>Your Tasks</h2>
+
+{% if tasks %}
+<table>
+    <tr>
+        <th>Title</th>
+        <th>Subject</th>
+        <th>Deadline</th>
+        <th>Difficulty</th>
+        <th>Estimated Hours</th>
+        <th>Status</th>
+        <th>Actions</th>
+    </tr>
+
+    {% for task in tasks %}
+    <tr>
+        <td>{{ task.title }}</td>
+        <td>{{ task.subject.name }}</td>
+        <td>{{ task.deadline }}</td>
+        <td>{{ task.get_difficulty_display }}</td>
+        <td>{{ task.estimated_hours }}</td>
+        <td>
+            {% if task.completed %}
+                ✅ Done
+            {% else %}
+                ⏳ Pending
+            {% endif %}
+        </td>
+        <td>
+<a href="{% url 'toggle_task' task.id %}">✔</a> |
+<a href="{% url 'edit_task' task.id %}">Edit</a> |
+<a href="{% url 'delete_task' task.id %}">Delete</a>
+</td>
+
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+<p>No tasks added yet. Start by adding one.</p>
+{% endif %}
+
+{% endblock %}

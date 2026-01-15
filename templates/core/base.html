@@ -1,0 +1,55 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <title>{% block title %}Smart Study Planner{% endblock %}</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Main CSS -->
+    <link rel="stylesheet" href="{% static 'core/style.css' %}">
+
+</head>
+<body>
+
+    <!-- ===== Nav =====-->
+     <nav>
+    <a href="{% url 'dashboard' %}">Dashboard</a>
+    <a href="{% url 'add_task' %}">Add Task</a>
+    <a href="{% url 'task_list' %}">Tasks</a>
+    </nav>
+
+
+    <!-- ===== Header ===== -->
+    <header>
+        <div class="container">
+            <h1>Smart Study Planner</h1>
+            <p style="color:#555;">Plan better. Study smarter. Stay consistent.</p>
+
+            <nav>
+                <a href="{% url 'home' %}">Home</a>
+                <a href="{% url 'add_task' %}">Add Task</a>
+                <a href="{% url 'task_list' %}">View Tasks</a>
+            </nav>
+        </div>
+        <hr>
+    </header>
+
+    <!-- ===== Main Content ===== -->
+    <main>
+        <div class="container">
+            {% block content %}
+            {% endblock %}
+        </div>
+    </main>
+
+    <!-- ===== Footer ===== -->
+    <footer style="margin-top:40px; text-align:center; color:#777;">
+        <hr>
+        <p>© 2026 Smart Study Planner | Built by Varun</p>
+    </footer>
+
+</body>
+</html>
