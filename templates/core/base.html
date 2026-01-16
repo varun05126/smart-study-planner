@@ -2,16 +2,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>{% block title %}Smart Study Planner{% endblock %}</title>
-
-<link rel="stylesheet" href="{% static 'core/style.css' %}">
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <title>Smart Study Planner</title>
+  <link rel="stylesheet" href="{% static 'style.css' %}">
 </head>
 
 <body>
@@ -22,9 +15,9 @@
   </div>
 
   <nav class="topbar-right">
-    <a href="{% url 'home' %}">Home</a>
     <a href="{% url 'dashboard' %}">Dashboard</a>
     <a href="{% url 'add_task' %}" class="btn-primary">+ Add Task</a>
+    <a href="{% url 'logout' %}" style="color:#dc2626;font-weight:600;">Logout</a>
   </nav>
 </header>
 
@@ -33,7 +26,7 @@
 </main>
 
 <footer class="footer">
-  <p>© 2026 Smart Study Planner. Built by Varun.</p>
+  © 2026 Smart Study Planner. Built by Varun.
 </footer>
 
 </body>

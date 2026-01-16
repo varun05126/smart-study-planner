@@ -1,39 +1,58 @@
 {% extends "core/base.html" %}
-{% block title %}Dashboard | Smart Study Planner{% endblock %}
 
 {% block content %}
 
 <h1>Welcome back 👋</h1>
-<p class="muted">Here’s your study overview.</p>
-
-<br>
+<p>Here’s your study overview.</p>
 
 <div class="grid-4">
-  <div class="card"><h3>Total Tasks</h3><p>12</p></div>
-  <div class="card"><h3>Completed</h3><p>5</p></div>
-  <div class="card"><h3>Pending</h3><p>7</p></div>
-  <div class="card"><h3>Study Streak</h3><p>3 days 🔥</p></div>
+
+  <div class="card">
+    <h3>Total Tasks</h3>
+    <p>{{ total_tasks }}</p>
+  </div>
+
+  <div class="card">
+    <h3>Completed</h3>
+    <p>{{ completed_count }}</p>
+  </div>
+
+  <div class="card">
+    <h3>Pending</h3>
+    <p>{{ pending_count }}</p>
+  </div>
+
+  <div class="card">
+    <h3>Study Streak</h3>
+    <p>Coming soon 🔥</p>
+  </div>
+
 </div>
 
-<br><br>
+<br>
 
 <div class="grid-2">
 
   <div class="card">
-    <h2>Today’s Focus</h2>
+    <h2>Your Tasks</h2>
     <ul>
-      <li>✔ Revise DSA Arrays</li>
-      <li>📘 Chemistry notes</li>
-      <li>🧠 AI assignment</li>
+      {% for task in tasks %}
+        <li>
+          <b>{{ task.title }}</b> — {{ task.subject.name }}  
+          ({{ task.deadline }})
+        </li>
+      {% empty %}
+        <p>No tasks yet. Start adding 🚀</p>
+      {% endfor %}
     </ul>
   </div>
 
   <div class="card">
-    <h2>Upcoming</h2>
+    <h2>Quick Tips</h2>
     <ul>
-      <li>Math internal test</li>
-      <li>Python project</li>
-      <li>Group discussion prep</li>
+      <li>✔ Break tasks into small parts</li>
+      <li>✔ Revise daily</li>
+      <li>✔ Don’t overload a single day</li>
     </ul>
   </div>
 

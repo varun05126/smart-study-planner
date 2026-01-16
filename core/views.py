@@ -22,6 +22,7 @@ def signup_view(request):
             return redirect("dashboard")
     else:
         form = SignupForm()
+
     return render(request, "signup.html", {"form": form})
 
 
@@ -51,13 +52,18 @@ def logout_view(request):
 
 @login_required
 def dashboard(request):
-    subjects = Subject.objects.filter(user=request.user)
-    tasks = Task.objects.filter(user=request.user).order_by("deadline")
+    tasks = Task.objects.filter(user=request.user)
+    completed = tasks.filter(completed=True)
+    pending = tasks.filter(completed=False)
 
-    return render(request, "dashboard.html", {
-        "subjects": subjects,
-        "tasks": tasks
-    })
+    context = {
+        "tasks": tasks.order_by("deadline"),
+        "total_tasks": tasks.count(),
+        "completed_count": completed.count(),
+        "pending_count": pending.count(),
+    }
+
+    return render(request, "core/dashboard.html", context)
 
 
 # ---------- SUBJECT ----------
@@ -73,7 +79,8 @@ def add_subject(request):
             return redirect("dashboard")
     else:
         form = SubjectForm()
-    return render(request, "add_subject.html", {"form": form})
+
+    return render(request, "core/add_subject.html", {"form": form})
 
 
 # ---------- TASK ----------
@@ -93,4 +100,4 @@ def add_task(request):
         form = TaskForm()
         form.fields["subject"].queryset = Subject.objects.filter(user=request.user)
 
-    return render(request, "add_task.html", {"form": form})
+    return render(request, "core/add_task.html", {"form": form})

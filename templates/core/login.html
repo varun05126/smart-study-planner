@@ -1,43 +1,44 @@
+{% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Login | Smart Study Planner</title>
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'core/style.css' %}">
+  <title>Login | Smart Study Planner</title>
+  <link rel="stylesheet" href="{% static 'style.css' %}">
 </head>
+
 <body class="auth-body">
 
 <div class="auth-container">
-    <div class="auth-card">
-        <h2>Welcome Back</h2>
-        <p class="auth-subtitle">Login to continue your study planning</p>
+  <div class="auth-card">
 
-        {% if error %}
-            <p class="error-text">{{ error }}</p>
-        {% endif %}
+    <h2>Welcome back 👋</h2>
+    <p class="auth-subtitle">Login to continue</p>
 
-        <form method="post">
-            {% csrf_token %}
+    {% if error %}
+      <p class="error-text">{{ error }}</p>
+    {% endif %}
 
-            <div class="form-group">
-                <label>Username</label>
-                <input type="text" name="username" required placeholder="Enter username">
-            </div>
+    <form method="post">
+      {% csrf_token %}
 
-            <div class="form-group">
-                <label>Password</label>
-                <input type="password" name="password" required placeholder="Enter password">
-            </div>
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" name="username" required>
+      </div>
 
-            <button type="submit" class="btn-primary">Login</button>
-        </form>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" name="password" required>
+      </div>
 
-        <p class="auth-switch">
-            Don’t have an account?
-            <a href="{% url 'signup' %}">Create one</a>
-        </p>
-    </div>
+      <button class="btn-primary">Login</button>
+    </form>
+
+    <p class="auth-switch">
+      New user? <a href="{% url 'signup' %}">Create account</a>
+    </p>
+
+  </div>
 </div>
 
 </body>
