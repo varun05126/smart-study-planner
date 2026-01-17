@@ -1,6 +1,5 @@
-{% extends "base.html" %}
+{% extends "core/base.html" %}
 {% load static %}
-
 {% block content %}
 
 <div class="page-title">
@@ -9,7 +8,6 @@
 </div>
 
 <div class="card form-card">
-
 <form method="POST" enctype="multipart/form-data" id="taskForm">
 {% csrf_token %}
 
@@ -33,20 +31,20 @@
 <!-- FILE -->
 <div class="form-group">
     <label>Upload Study Material (PDF / TXT / DOCX)</label>
-    <input type="file" name="study_file" id="studyFile" class="input" accept=".pdf,.txt,.docx">
+    <input type="file" name="study_file" id="studyFile" class="input-file" accept=".pdf,.txt,.docx">
     <small class="hint">Uploading a file enables smart difficulty estimation.</small>
 </div>
 
 <hr class="soft-line">
 
-<!-- AUTO ESTIMATION BOX -->
-<div id="autoBox" class="auto-box" style="display:none;">
+<!-- AUTO BOX -->
+<div id="autoBox" class="auto-box">
     <h4>🤖 Smart Analysis</h4>
-    <p id="autoStatus">Reading document...</p>
+    <p id="autoStatus">Waiting for document...</p>
 
     <div class="estimate-result">
         <strong>Estimated Difficulty:</strong>
-        <span id="estimatedLevel">Processing...</span>
+        <span id="estimatedLevel">—</span>
     </div>
 
     <p class="confirm-text">
@@ -79,11 +77,10 @@
 </div>
 
 <button type="submit" class="btn-primary">Create Smart Task</button>
-
 </form>
 </div>
 
-<!-- ================= SMART FRONTEND LOGIC ================= -->
+<!-- ================= SMART FRONTEND ================= -->
 
 <script>
 const fileInput = document.getElementById("studyFile");
@@ -92,13 +89,14 @@ const autoStatus = document.getElementById("autoStatus");
 const estimatedLevel = document.getElementById("estimatedLevel");
 const difficultySelect = document.getElementById("id_difficulty");
 
+autoBox.style.display = "none";
+
 fileInput.addEventListener("change", function () {
     if (this.files.length > 0) {
         autoBox.style.display = "block";
         autoStatus.innerText = "Analyzing document...";
-        estimatedLevel.innerText = "Please wait...";
+        estimatedLevel.innerText = "Processing...";
 
-        // Fake smart delay (backend will replace this)
         setTimeout(() => {
             let levels = ["Easy", "Medium", "Hard"];
             let picked = levels[Math.floor(Math.random() * levels.length)];
@@ -106,13 +104,11 @@ fileInput.addEventListener("change", function () {
             autoStatus.innerText = "Analysis complete.";
             estimatedLevel.innerText = picked;
 
-            // Auto-set difficulty dropdown
             for (let i = 0; i < difficultySelect.options.length; i++) {
                 if (difficultySelect.options[i].text === picked) {
                     difficultySelect.selectedIndex = i;
                 }
             }
-
         }, 1200);
     } else {
         autoBox.style.display = "none";
@@ -123,35 +119,67 @@ fileInput.addEventListener("change", function () {
 <!-- ================= STYLES ================= -->
 
 <style>
-.auto-box {
+.page-title h2 {
+    font-size: 1.6rem;
+    margin-bottom: 6px;
+}
+
+.page-title p {
+    color: #64748b;
+    margin-bottom: 20px;
+}
+
+.form-card {
+    padding: 28px;
+}
+
+.form-group {
+    margin-bottom: 18px;
+}
+
+.input-file {
+    border: 1.8px dashed #c7d2fe;
+    padding: 14px;
+    border-radius: 12px;
     background: #f8fafc;
-    border: 1px solid #e5e7eb;
+    width: 100%;
+}
+
+.hint {
+    font-size: 13px;
+    color: #64748b;
+}
+
+.auto-box {
+    display: none;
+    background: linear-gradient(135deg,#eef2ff,#f8fafc);
+    border-left: 5px solid #4f46e5;
     border-radius: 14px;
-    padding: 18px;
-    margin: 18px 0;
+    padding: 16px;
+    margin-bottom: 20px;
 }
 
 .auto-box h4 {
+    color: #4338ca;
     margin-bottom: 6px;
-    color: #4f46e5;
 }
 
 .estimate-result {
-    margin-top: 8px;
+    margin-top: 6px;
     font-size: 1.05rem;
 }
 
 .confirm-text {
     margin-top: 6px;
     font-size: 0.9rem;
-    color: #555;
+    color: #475569;
 }
 
 .soft-line {
     border: none;
     height: 1px;
-    background: #eee;
-    margin: 20px 0;
+    background: #e5e7eb;
+    margin: 22px 0;
 }
 </style>
 

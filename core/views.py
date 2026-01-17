@@ -56,15 +56,24 @@ def logout_view(request):
 
 # ---------- DASHBOARD ----------
 
-@login_required(login_url="login")
+@login_required
 def dashboard(request):
-    subjects = Subject.objects.filter(user=request.user)
+    
     tasks = Task.objects.filter(user=request.user).order_by("deadline")
 
-    return render(request, "core/dashboard.html", {
-        "subjects": subjects,
-        "tasks": tasks
-    })
+    total_tasks = tasks.count()
+    completed_count = tasks.filter(completed=True).count()
+    pending_count = tasks.filter(completed=False).count()
+
+    context = {
+        "tasks": tasks,
+        "total_tasks": total_tasks,
+        "completed_count": completed_count,
+        "pending_count": pending_count,
+    }
+
+    return render(request, "core/dashboard.html", context)
+
 
 
 # ---------- SUBJECTS ----------
