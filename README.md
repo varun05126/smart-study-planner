@@ -88,8 +88,8 @@ studystack/
 ## ⚙️ Setup Instructions
 
 ```bash
-git clone <your-repo-url>
-cd studystack
+git clone "https://github.com/varun05126/StudyStack"
+cd StudyStack
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
@@ -98,7 +98,7 @@ python3 manage.py runserver
 
 Open: http://127.0.0.1:8000
 
-## 👨‍💻 Author
+👨‍💻 Author
 
 Varun M
 B.Tech CSE (AI & ML)
@@ -106,7 +106,7 @@ Vardhaman College of Engineering
 Project: StudyStack
 
 
-## 📌 Status
+📌 Status
 
 StudyStack is under active development.
 Features are being added step-by-step with a focus on building a real-world usable learning platform.
