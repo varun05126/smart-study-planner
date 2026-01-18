@@ -99,16 +99,18 @@ python3 manage.py runserver
 Open: http://127.0.0.1:8000
 
 ---
-##
-👨‍💻 Author
+## 👨‍💻 Author
 
-Varun M
-B.Tech CSE (AI & ML)
-Vardhaman College of Engineering
-Project: StudyStack
+StudyStack is designed and developed by:
+
+**Varun M**  
+B.Tech CSE (Artificial Intelligence & Machine Learning)  
+Vardhaman College of Engineering, Telangana, India  
+
+Passionate about building practical, student-centric learning platforms.
 
 
-📌 Status
+## 📌 Status
 
 StudyStack is under active development.
 Features are being added step-by-step with a focus on building a real-world usable learning platform.
