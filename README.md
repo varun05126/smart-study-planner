@@ -86,8 +86,7 @@ studystack/
 
 ---
 ## ⚙️ Setup Instructions
-
-```bash
+~~~
 git clone "https://github.com/varun05126/StudyStack"
 cd StudyStack
 python3 -m venv venv
@@ -97,7 +96,7 @@ python3 manage.py migrate
 python3 manage.py runserver
 
 Open: http://127.0.0.1:8000
-
+~~~
 ---
 ## 👨‍💻 Author
 
