@@ -16,8 +16,11 @@
 
   <nav class="topbar-right">
     <a href="{% url 'dashboard' %}">Dashboard</a>
-    <a href="{% url 'add_task' %}" class="btn-primary">+ Add Task</a>
-    <a href="{% url 'logout' %}" style="color:#dc2626;font-weight:600;">Logout</a>
+<a href="{% url 'add_task' %}">Add Task</a>
+<a href="{% url 'add_note' %}">Add Note</a>
+<a href="{% url 'my_notes' %}">My Notes</a>
+<a href="{% url 'public_library' %}">Library</a>
+<a href="{% url 'logout' %}">Logout</a>
   </nav>
 </header>
 

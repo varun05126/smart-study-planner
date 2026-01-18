@@ -1,0 +1,26 @@
+{% extends "core/base.html" %}
+{% block content %}
+
+<h2>📁 My StudyStack</h2>
+
+<h3>My Notes</h3>
+<ul>
+{% for note in my_notes %}
+  <li><b>{{ note.title }}</b> — {{ note.visibility }}</li>
+{% empty %}
+  <p>No notes yet.</p>
+{% endfor %}
+</ul>
+
+<hr>
+
+<h3>⭐ Saved Notes</h3>
+<ul>
+{% for note in saved_notes %}
+  <li><b>{{ note.title }}</b> — by {{ note.user.username }}</li>
+{% empty %}
+  <p>No saved notes.</p>
+{% endfor %}
+</ul>
+
+{% endblock %}

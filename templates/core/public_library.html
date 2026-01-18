@@ -1,0 +1,28 @@
+{% extends "core/base.html" %}
+{% block content %}
+
+<h2>🌍 Public StudyStack Library</h2>
+
+{% for note in notes %}
+<div class="card" style="margin-bottom:10px;">
+  <h3>{{ note.title }}</h3>
+  <p>By {{ note.user.username }}</p>
+
+  {% if note.text_content %}
+    <p>{{ note.text_content|truncatewords:25 }}</p>
+  {% endif %}
+
+  {% if note.file %}
+    <a href="{{ note.file.url }}" target="_blank">📄 Download file</a>
+  {% endif %}
+
+  <br>
+  <a href="{% url 'toggle_save_note' note.id %}" class="btn-secondary">
+    ⭐ Save / Unsave
+  </a>
+</div>
+{% empty %}
+<p>No public notes yet.</p>
+{% endfor %}
+
+{% endblock %}

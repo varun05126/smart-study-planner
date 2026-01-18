@@ -1,45 +1,27 @@
 from django import forms
+from .models import Task, Subject, Note
 from django.contrib.auth.models import User
-from .models import Subject, Task
 
-
-# ---------- AUTH FORM ----------
 
 class SignupForm(forms.Form):
-    username = forms.CharField(max_length=150, widget=forms.TextInput(attrs={
-        "class": "form-control",
-        "placeholder": "Username"
-    }))
+    username = forms.CharField(max_length=150)
+    email = forms.EmailField()
+    password = forms.CharField(widget=forms.PasswordInput)
 
-    email = forms.EmailField(widget=forms.EmailInput(attrs={
-        "class": "form-control",
-        "placeholder": "Email address"
-    }))
-
-    password = forms.CharField(widget=forms.PasswordInput(attrs={
-        "class": "form-control",
-        "placeholder": "Password"
-    }))
-
-
-# ---------- SUBJECT FORM ----------
 
 class SubjectForm(forms.ModelForm):
     class Meta:
         model = Subject
-        fields = ["name", "description"]
-        widgets = {
-            "name": forms.TextInput(attrs={
-                "class": "form-control",
-                "placeholder": "e.g. Data Structures"
-            }),
-            "description": forms.Textarea(attrs={
-                "class": "form-control",
-                "placeholder": "Optional description",
-                "rows": 3
-            }),
-        }
+        fields = ["name"]
 
+
+class NoteForm(forms.ModelForm):
+    class Meta:
+        model = Note
+        fields = ["title", "subject", "text_content", "file", "visibility"]
+        widgets = {
+            "text_content": forms.Textarea(attrs={"rows": 5, "placeholder": "Write your notes here..."}),
+        }
 
 # ---------- TASK FORM ----------
 
