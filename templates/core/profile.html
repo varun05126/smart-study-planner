@@ -1,0 +1,49 @@
+{% extends "core/base.html" %}
+{% block content %}
+
+<h1>👤 My Profile</h1>
+<p>Your central learning identity on StudyStack.</p>
+
+<div class="grid-2">
+
+  <div class="card">
+    <h2>🔥 Study Identity</h2>
+    <p><b>Username:</b> {{ request.user.username }}</p>
+    <p><b>Email:</b> {{ request.user.email }}</p>
+    <p><b>Current streak:</b> {{ streak.current_streak }} days</p>
+    <p><b>Longest streak:</b> {{ streak.longest_streak }} days</p>
+  </div>
+
+  <div class="card">
+    <h2>🎯 Learning Goals</h2>
+    {% for g in goals %}
+      <p>• {{ g.title }}</p>
+    {% empty %}
+      <p>No learning goals yet.</p>
+    {% endfor %}
+    <br>
+    <a class="btn-primary" href="{% url 'learning_goals' %}">Manage goals</a>
+  </div>
+
+</div>
+
+<br>
+
+<div class="card">
+  <h2>🔗 Connected Platforms</h2>
+  <p>StudyStack will become your learning control center.</p>
+
+  <ul style="line-height:2">
+    <li>📘 LeetCode — Not connected</li>
+    <li>💻 GitHub — Not connected</li>
+    <li>🎓 Coursera — Not connected</li>
+    <li>📚 Udemy — Not connected</li>
+    <li>⚡ HackerRank — Not connected</li>
+  </ul>
+
+  <p style="color:#64748b;">
+    (Coming next: time tracking, unified heatmap, smart analytics)
+  </p>
+</div>
+
+{% endblock %}

@@ -1,49 +1,41 @@
 {% extends "core/base.html" %}
 {% block content %}
 
-<h1>🎯 Learning Goals</h1>
-<p>Tell StudyStack what you want to learn. We’ll build around this.</p>
+<h1>🎯 My Learning Goals</h1>
+<p style="color:#64748b;">Tell StudyStack what you want to learn. We’ll help you build it step-by-step.</p>
 
-<div class="grid-2">
+<br>
 
 <!-- ADD GOAL -->
-<div class="card">
-  <h2>➕ Add New Goal</h2>
+<div class="card" style="max-width:500px;margin-bottom:25px;">
+  <h3>➕ Add New Goal</h3>
 
   <form method="post">
     {% csrf_token %}
     {{ form.title }}
-    <br><br>
-    <button class="btn-primary">Add Goal</button>
+    <br>
+    <button class="btn-primary" style="margin-top:10px;">Add Goal</button>
   </form>
 </div>
 
-<!-- MY GOALS -->
+<!-- GOALS LIST -->
 <div class="card">
-  <h2>📚 My Goals</h2>
+  <h3>📚 Your Goals</h3>
 
   {% for goal in goals %}
-    <div style="
-      padding:12px;
-      margin-bottom:10px;
-      border-radius:10px;
-      background:#f8fafc;
-      border-left:5px solid #6366f1;
-    ">
+    <div style="padding:12px;border-radius:12px;background:#f8fafc;margin-bottom:10px;border-left:5px solid #6366f1;">
       <b>{{ goal.title }}</b><br>
-      <small>Started: {{ goal.created_at|date:"d M Y" }}</small>
+      <small style="color:#64748b;">Added on {{ goal.created_at|date:"M d, Y" }}</small>
 
-      <div style="margin-top:6px;color:#475569;">
-        🔹 Notes coming soon  
-        🔹 Problems coming soon  
-        🔹 Roadmap coming soon
+      <div style="margin-top:8px;">
+        <span style="font-size:13px;background:#eef2ff;padding:4px 10px;border-radius:20px;">
+          🚀 Learning Mode
+        </span>
       </div>
     </div>
   {% empty %}
-    <p>No goals yet. Start with one 🎯</p>
+    <p>No goals yet. Add one and start building your stack.</p>
   {% endfor %}
-</div>
-
 </div>
 
 {% endblock %}

@@ -1,0 +1,38 @@
+{% extends "core/base.html" %}
+{% block content %}
+
+<h1>📋 My Tasks</h1>
+<p>All your study tasks in one place.</p>
+
+<div class="card">
+
+{% for task in tasks %}
+  <div style="
+    padding:14px;
+    border-radius:10px;
+    margin-bottom:10px;
+    background:{% if task.completed %}#ecfdf5{% elif task.deadline < today %}#fef2f2{% else %}#f8fafc{% endif %};
+    border-left:5px solid {% if task.completed %}#10b981{% elif task.deadline < today %}#ef4444{% else %}#6366f1{% endif %};
+  ">
+
+    <b>{{ task.title }}</b> — {{ task.subject.name }} <br>
+    Deadline: {{ task.deadline }}
+
+    {% if task.deadline < today and not task.completed %}
+      <span style="color:#dc2626;font-weight:600;">(Overdue)</span>
+    {% endif %}
+
+    <div style="margin-top:8px;">
+      <a href="{% url 'toggle_task' task.id %}" class="btn-primary" style="padding:6px 12px;">
+        {% if task.completed %}↩ Undo{% else %}✔ Complete{% endif %}
+      </a>
+    </div>
+
+  </div>
+{% empty %}
+  <p>No tasks yet. Start adding 🚀</p>
+{% endfor %}
+
+</div>
+
+{% endblock %}

@@ -83,4 +83,4 @@ class StudyStreak(models.Model):
     last_active = models.DateField(null=True, blank=True)
 
     def __str__(self):
-        return f"{self.user.username} - {self.current_streak}🔥"
+        return f"{self.user.username} - {self.current_streak}"

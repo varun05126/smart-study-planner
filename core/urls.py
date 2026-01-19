@@ -6,8 +6,11 @@ urlpatterns = [
     path("signup/", views.signup_view, name="signup"),
     path("logout/", views.logout_view, name="logout"),
 
+    # -------- Dashboard & Tasks --------
+    path("profile/", views.profile, name="profile"),
     path("dashboard/", views.dashboard, name="dashboard"),
     path("add-task/", views.add_task, name="add_task"),
+    path("tasks/", views.my_tasks, name="my_tasks"),
     path("task/toggle/<int:task_id>/", views.toggle_task, name="toggle_task"),
 
     # -------- Notes --------

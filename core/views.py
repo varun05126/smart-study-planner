@@ -191,3 +191,23 @@ def learning_goals(request):
         "goals": goals,
         "form": form
     })
+
+# ================= PROFILE =================
+@login_required
+def profile(request):
+    goals = LearningGoal.objects.filter(user=request.user)
+    streak, _ = StudyStreak.objects.get_or_create(user=request.user)
+
+    return render(request, "core/profile.html", {
+        "goals": goals,
+        "streak": streak,
+    })
+
+# ================= MY TASKS =================
+@login_required
+def my_tasks(request):
+    tasks = Task.objects.filter(user=request.user).order_by("deadline")
+    return render(request, "core/my_tasks.html", {
+        "tasks": tasks,
+        "today": timezone.now().date()
+    })

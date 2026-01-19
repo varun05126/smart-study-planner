@@ -2,8 +2,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
- <title>StudyStack</title>
-
+  <meta charset="UTF-8">
+  <title>StudyStack</title>
   <link rel="stylesheet" href="{% static 'core/style.css' %}">
 </head>
 
@@ -14,14 +14,20 @@
     <span class="logo">📘 StudyStack</span>
   </div>
 
-  <nav class="topbar-right">
+  <div class="topbar-right">
+
+    <div class="nav-links">
     <a href="{% url 'dashboard' %}">Dashboard</a>
-<a href="{% url 'add_task' %}">Add Task</a>
-<a href="{% url 'add_note' %}">Add Note</a>
-<a href="{% url 'my_notes' %}">My Notes</a>
-<a href="{% url 'public_library' %}">Library</a>
-<a href="{% url 'logout' %}">Logout</a>
-  </nav>
+    <a href="{% url 'add_task' %}">Add Task</a>
+    <a href="{% url 'my_tasks' %}">My Tasks</a>
+    <a href="{% url 'add_note' %}">Add Note</a>
+    <a href="{% url 'my_notes' %}">My Notes</a>
+    <a href="{% url 'learning_goals' %}">Goals</a>
+    <a href="{% url 'public_library' %}">Library</a>
+    <a href ="{% url 'profile' %}">My Profile</a>
+  </div>
+  
+  </div>
 </header>
 
 <main class="main-container">
@@ -29,8 +35,19 @@
 </main>
 
 <footer class="footer">
-  © 2026 Smart Study Planner. Built by Varun.
+  © 2026 StudyStack. Built by Varun.
 </footer>
+
+<script>
+function toggleProfile(e) {
+  e.stopPropagation();
+  document.getElementById("profileDropdown").classList.toggle("show");
+}
+
+document.addEventListener("click", function () {
+  document.getElementById("profileDropdown").classList.remove("show");
+});
+</script>
 
 </body>
 </html>
