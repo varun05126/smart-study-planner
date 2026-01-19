@@ -7,7 +7,7 @@ from .models import Subject, Task, Note
 from .forms import SignupForm, SubjectForm, TaskForm, NoteForm
 
 
-# ---------- AUTH ----------
+# ================= AUTH =================
 
 def signup_view(request):
     if request.method == "POST":
@@ -46,7 +46,7 @@ def logout_view(request):
     return redirect("login")
 
 
-# ---------- DASHBOARD ----------
+# ================= DASHBOARD =================
 
 @login_required
 def dashboard(request):
@@ -58,22 +58,28 @@ def dashboard(request):
         "completed_count": tasks.filter(completed=True).count(),
         "pending_count": tasks.filter(completed=False).count(),
     }
+
     return render(request, "core/dashboard.html", context)
 
 
-# ---------- TASK ----------
+# ================= TASK =================
 
 @login_required
 def add_task(request):
     if request.method == "POST":
         form = TaskForm(request.POST, request.FILES)
+
         if form.is_valid():
             task = form.save(commit=False)
             task.user = request.user
 
+            # Handle new subject
             new_subject = request.POST.get("new_subject")
             if new_subject:
-                subject, _ = Subject.objects.get_or_create(name=new_subject, user=request.user)
+                subject, _ = Subject.objects.get_or_create(
+                    name=new_subject,
+                    user=request.user
+                )
                 task.subject = subject
 
             task.save()
@@ -85,7 +91,7 @@ def add_task(request):
     return render(request, "core/add_task.html", {"form": form})
 
 
-# ===================== STUDYSTACK NOTES =====================
+# ================= STUDYSTACK NOTES =================
 
 @login_required
 def add_note(request):
@@ -129,3 +135,4 @@ def toggle_save_note(request, note_id):
         note.saved_by.add(request.user)
 
     return redirect(request.META.get("HTTP_REFERER", "public_library"))
+    

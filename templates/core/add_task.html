@@ -4,7 +4,7 @@
 
 <div class="page-title">
     <h2>➕ Add Smart Task</h2>
-    <p>Upload study material or create a task manually. The system will help estimate difficulty.</p>
+    <p>Upload study material or create a task manually. StudyStack will help estimate difficulty.</p>
 </div>
 
 <div class="card form-card">
@@ -25,13 +25,14 @@
 
 <div class="form-group">
     <label>Or Create New Subject</label>
-    <input type="text" name="new_subject" class="input" placeholder="e.g. Engineering Chemistry">
+    <input type="text" name="new_subject" class="form-control"
+           placeholder="e.g. Engineering Chemistry">
 </div>
 
 <!-- FILE -->
 <div class="form-group">
     <label>Upload Study Material (PDF / TXT / DOCX)</label>
-    <input type="file" name="study_file" id="studyFile" class="input-file" accept=".pdf,.txt,.docx">
+    {{ form.uploaded_file }}
     <small class="hint">Uploading a file enables smart difficulty estimation.</small>
 </div>
 
@@ -77,13 +78,14 @@
 </div>
 
 <button type="submit" class="btn-primary">Create Smart Task</button>
+
 </form>
 </div>
 
 <!-- ================= SMART FRONTEND ================= -->
 
 <script>
-const fileInput = document.getElementById("studyFile");
+const fileInput = document.getElementById("id_uploaded_file");
 const autoBox = document.getElementById("autoBox");
 const autoStatus = document.getElementById("autoStatus");
 const estimatedLevel = document.getElementById("estimatedLevel");
@@ -91,29 +93,31 @@ const difficultySelect = document.getElementById("id_difficulty");
 
 autoBox.style.display = "none";
 
-fileInput.addEventListener("change", function () {
-    if (this.files.length > 0) {
-        autoBox.style.display = "block";
-        autoStatus.innerText = "Analyzing document...";
-        estimatedLevel.innerText = "Processing...";
+if (fileInput) {
+  fileInput.addEventListener("change", function () {
+      if (this.files.length > 0) {
+          autoBox.style.display = "block";
+          autoStatus.innerText = "Analyzing document...";
+          estimatedLevel.innerText = "Processing...";
 
-        setTimeout(() => {
-            let levels = ["Easy", "Medium", "Hard"];
-            let picked = levels[Math.floor(Math.random() * levels.length)];
+          setTimeout(() => {
+              let levels = ["Easy", "Medium", "Hard"];
+              let picked = levels[Math.floor(Math.random() * levels.length)];
 
-            autoStatus.innerText = "Analysis complete.";
-            estimatedLevel.innerText = picked;
+              autoStatus.innerText = "Analysis complete.";
+              estimatedLevel.innerText = picked;
 
-            for (let i = 0; i < difficultySelect.options.length; i++) {
-                if (difficultySelect.options[i].text === picked) {
-                    difficultySelect.selectedIndex = i;
-                }
-            }
-        }, 1200);
-    } else {
-        autoBox.style.display = "none";
-    }
-});
+              for (let i = 0; i < difficultySelect.options.length; i++) {
+                  if (difficultySelect.options[i].text === picked) {
+                      difficultySelect.selectedIndex = i;
+                  }
+              }
+          }, 1200);
+      } else {
+          autoBox.style.display = "none";
+      }
+  });
+}
 </script>
 
 <!-- ================= STYLES ================= -->
@@ -137,21 +141,12 @@ fileInput.addEventListener("change", function () {
     margin-bottom: 18px;
 }
 
-.input-file {
-    border: 1.8px dashed #c7d2fe;
-    padding: 14px;
-    border-radius: 12px;
-    background: #f8fafc;
-    width: 100%;
-}
-
 .hint {
     font-size: 13px;
     color: #64748b;
 }
 
 .auto-box {
-    display: none;
     background: linear-gradient(135deg,#eef2ff,#f8fafc);
     border-left: 5px solid #4f46e5;
     border-radius: 14px;

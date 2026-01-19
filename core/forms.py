@@ -20,15 +20,28 @@ class NoteForm(forms.ModelForm):
         model = Note
         fields = ["title", "subject", "text_content", "file", "visibility"]
         widgets = {
-            "text_content": forms.Textarea(attrs={"rows": 5, "placeholder": "Write your notes here..."}),
+            "text_content": forms.Textarea(attrs={
+                "rows": 5,
+                "placeholder": "Write your notes here..."
+            }),
         }
 
-# ---------- TASK FORM ----------
+
+# ================= TASK FORM =================
 
 class TaskForm(forms.ModelForm):
     class Meta:
         model = Task
-        fields = ["title", "subject", "deadline", "estimated_hours", "difficulty"]
+        fields = [
+            "title",
+            "subject",
+            "deadline",
+            "estimated_hours",
+            "difficulty",
+            "notes",
+            "uploaded_file",
+        ]
+
         widgets = {
             "title": forms.TextInput(attrs={
                 "class": "form-control",
@@ -49,4 +62,10 @@ class TaskForm(forms.ModelForm):
             "subject": forms.Select(attrs={
                 "class": "form-control"
             }),
+            "notes": forms.Textarea(attrs={
+                "class": "form-control",
+                "rows": 4,
+                "placeholder": "Optional notes or task description..."
+            }),
         }
+        
