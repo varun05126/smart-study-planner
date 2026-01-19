@@ -5,59 +5,97 @@
 <h1>Welcome back 👋</h1>
 <p>Here’s your study overview.</p>
 
+<!-- ================= LEARNING GOAL ================= -->
+
+<div class="card" style="margin-bottom:22px;">
+  <h2>🎯 What do you want to learn?</h2>
+
+  <form method="POST" action="{% url 'learning_goals' %}">
+    {% csrf_token %}
+    <div style="display:flex;gap:12px;flex-wrap:wrap;">
+      <input type="text" name="title" required
+             placeholder="e.g. Data Structures, Python, AI, Web Development"
+             style="flex:1;padding:10px;border-radius:10px;border:1px solid #e5e7eb;">
+      <button class="btn-primary">Save Goal</button>
+    </div>
+  </form>
+
+  {% if current_goal %}
+    <p style="margin-top:12px;">
+      <strong>Current focus:</strong> 
+      <span style="color:#4f46e5;">{{ current_goal.title }}</span>
+    </p>
+  {% endif %}
+
+  <div style="margin-top:14px;color:#475569;font-size:14px;">
+    Popular paths: DSA • Web Dev • AI/ML • Cybersecurity • Core CS • Aptitude
+  </div>
+</div>
+
+<!-- ================= PROGRESS ================= -->
+
+<div class="card" style="margin-bottom:20px;">
+  <h3>Overall Progress</h3>
+  <div style="background:#e5e7eb;border-radius:20px;overflow:hidden;">
+    <div style="width:{{ progress|default:0 }}%;background:#4f46e5;color:white;padding:6px 10px;">
+      {{ progress|default:0 }}%
+    </div>
+  </div>
+</div>
+
 <div class="grid-4">
-
-  <div class="card">
-    <h3>Total Tasks</h3>
-    <p>{{ total_tasks }}</p>
-  </div>
-
-  <div class="card">
-    <h3>Completed</h3>
-    <p>{{ completed_count }}</p>
-  </div>
-
-  <div class="card">
-    <h3>Pending</h3>
-    <p>{{ pending_count }}</p>
-  </div>
-
-  <div class="card">
-    <h3>Study Streak</h3>
-    <p>Coming soon 🔥</p>
-  </div>
-
+  <div class="card"><h3>Total Tasks</h3><p>{{ total_tasks }}</p></div>
+  <div class="card"><h3>Completed</h3><p>{{ completed_count }}</p></div>
+  <div class="card"><h3>Pending</h3><p>{{ pending_count }}</p></div>
+  <div class="card"><h3>Study Streak</h3><p>{{ streak }} days 🔥</p></div>
 </div>
 
 <br>
 
 <div class="grid-2">
 
-  <div class="card">
-    <h2>Your Tasks</h2>
-    <ul>
-      {% for task in tasks %}
-        <li>
-          <b>{{ task.title }}</b> — {{ task.subject.name }}  
-          ({{ task.deadline }})
-        </li>
-      {% empty %}
-        <p>No tasks yet. Start adding 🚀</p>
-      {% endfor %}
-    </ul>
-  </div>
+<div class="card">
+<h2>Your Tasks</h2>
 
-  <div class="card">
-    <h2>Quick Tips</h2>
-    <ul>
-      <li>✔ Break tasks into small parts</li>
-      <li>✔ Revise daily</li>
-      <li>✔ Don’t overload a single day</li>
-    </ul>
+{% for task in tasks %}
+  <div style="
+    padding:12px;
+    border-radius:10px;
+    margin-bottom:10px;
+    background:{% if task.completed %}#ecfdf5{% elif task.deadline < today %}#fef2f2{% else %}#f8fafc{% endif %};
+    border-left:5px solid {% if task.completed %}#10b981{% elif task.deadline < today %}#ef4444{% else %}#6366f1{% endif %};
+  ">
+
+    <b>{{ task.title }}</b> — {{ task.subject.name }} <br>
+    Deadline: {{ task.deadline }}
+
+    {% if task.deadline < today and not task.completed %}
+      <span style="color:#dc2626;font-weight:600;">(Overdue)</span>
+    {% endif %}
+
+    <div style="margin-top:8px;">
+      <a href="{% url 'toggle_task' task.id %}" class="btn-primary" style="padding:6px 12px;">
+        {% if task.completed %}↩ Undo{% else %}✔ Complete{% endif %}
+      </a>
+    </div>
+
   </div>
+{% empty %}
+  <p>No tasks yet. Start adding 🚀</p>
+{% endfor %}
+
+</div>
+
+<div class="card">
+  <h2>Quick Tips</h2>
+  <ul>
+    <li>✔ Break tasks into small parts</li>
+    <li>✔ Revise daily</li>
+    <li>✔ Don’t overload a single day</li>
+    <li>✔ Practice problems after every topic</li>
+  </ul>
+</div>
 
 </div>
 
 {% endblock %}
-
-

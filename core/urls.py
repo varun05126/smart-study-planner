@@ -8,10 +8,14 @@ urlpatterns = [
 
     path("dashboard/", views.dashboard, name="dashboard"),
     path("add-task/", views.add_task, name="add_task"),
+    path("task/toggle/<int:task_id>/", views.toggle_task, name="toggle_task"),
 
-    # -------- StudyStack Notes --------
+    # -------- Notes --------
     path("notes/add/", views.add_note, name="add_note"),
     path("notes/my/", views.my_notes, name="my_notes"),
     path("notes/library/", views.public_library, name="public_library"),
     path("notes/save/<int:note_id>/", views.toggle_save_note, name="toggle_save_note"),
+
+    # -------- Learning Goals --------
+    path("goals/", views.learning_goals, name="learning_goals"),
 ]

@@ -2,9 +2,10 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.utils import timezone
 
-from .models import Subject, Task, Note
-from .forms import SignupForm, SubjectForm, TaskForm, NoteForm
+from .models import Subject, Task, Note, StudyStreak, LearningGoal
+from .forms import SignupForm, SubjectForm, TaskForm, NoteForm, LearningGoalForm
 
 
 # ================= AUTH =================
@@ -50,16 +51,27 @@ def logout_view(request):
 
 @login_required
 def dashboard(request):
-    tasks = Task.objects.filter(user=request.user)
+    tasks = Task.objects.filter(user=request.user).order_by("deadline")
 
-    context = {
+    total = tasks.count()
+    completed = tasks.filter(completed=True).count()
+    pending = tasks.filter(completed=False).count()
+    progress = int((completed / total) * 100) if total else 0
+
+    streak, _ = StudyStreak.objects.get_or_create(user=request.user)
+
+    goals = LearningGoal.objects.filter(user=request.user).order_by("-created_at")[:5]
+
+    return render(request, "core/dashboard.html", {
         "tasks": tasks,
-        "total_tasks": tasks.count(),
-        "completed_count": tasks.filter(completed=True).count(),
-        "pending_count": tasks.filter(completed=False).count(),
-    }
-
-    return render(request, "core/dashboard.html", context)
+        "total_tasks": total,
+        "completed_count": completed,
+        "pending_count": pending,
+        "progress": progress,
+        "streak": streak,
+        "today": timezone.now().date(),
+        "goals": goals
+    })
 
 
 # ================= TASK =================
@@ -68,12 +80,10 @@ def dashboard(request):
 def add_task(request):
     if request.method == "POST":
         form = TaskForm(request.POST, request.FILES)
-
         if form.is_valid():
             task = form.save(commit=False)
             task.user = request.user
 
-            # Handle new subject
             new_subject = request.POST.get("new_subject")
             if new_subject:
                 subject, _ = Subject.objects.get_or_create(
@@ -91,7 +101,31 @@ def add_task(request):
     return render(request, "core/add_task.html", {"form": form})
 
 
-# ================= STUDYSTACK NOTES =================
+@login_required
+def toggle_task(request, task_id):
+    task = get_object_or_404(Task, id=task_id, user=request.user)
+    task.completed = not task.completed
+    task.save()
+
+    today = timezone.now().date()
+    streak, _ = StudyStreak.objects.get_or_create(user=request.user)
+
+    if task.completed:
+        if streak.last_active == today:
+            pass
+        elif streak.last_active == today - timezone.timedelta(days=1):
+            streak.current_streak += 1
+        else:
+            streak.current_streak = 1
+
+        streak.last_active = today
+        streak.longest_streak = max(streak.longest_streak, streak.current_streak)
+        streak.save()
+
+    return redirect("dashboard")
+
+
+# ================= NOTES =================
 
 @login_required
 def add_note(request):
@@ -110,18 +144,18 @@ def add_note(request):
 
 @login_required
 def my_notes(request):
-    my_notes = Note.objects.filter(user=request.user)
-    saved_notes = request.user.saved_notes.all()
-
     return render(request, "core/my_notes.html", {
-        "my_notes": my_notes,
-        "saved_notes": saved_notes
+        "my_notes": Note.objects.filter(user=request.user).order_by("-created_at"),
+        "saved_notes": request.user.saved_notes.all()
     })
 
 
 @login_required
 def public_library(request):
-    notes = Note.objects.filter(visibility="public").exclude(user=request.user)
+    notes = Note.objects.filter(
+        visibility="public"
+    ).exclude(user=request.user).order_by("-created_at")
+
     return render(request, "core/public_library.html", {"notes": notes})
 
 
@@ -135,4 +169,25 @@ def toggle_save_note(request, note_id):
         note.saved_by.add(request.user)
 
     return redirect(request.META.get("HTTP_REFERER", "public_library"))
-    
+
+
+# ================= LEARNING GOALS =================
+
+@login_required
+def learning_goals(request):
+    goals = LearningGoal.objects.filter(user=request.user).order_by("-created_at")
+
+    if request.method == "POST":
+        form = LearningGoalForm(request.POST)
+        if form.is_valid():
+            goal = form.save(commit=False)
+            goal.user = request.user
+            goal.save()
+            return redirect("learning_goals")
+    else:
+        form = LearningGoalForm()
+
+    return render(request, "core/learning_goals.html", {
+        "goals": goals,
+        "form": form
+    })

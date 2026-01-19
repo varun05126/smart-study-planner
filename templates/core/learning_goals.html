@@ -1,0 +1,49 @@
+{% extends "core/base.html" %}
+{% block content %}
+
+<h1>🎯 Learning Goals</h1>
+<p>Tell StudyStack what you want to learn. We’ll build around this.</p>
+
+<div class="grid-2">
+
+<!-- ADD GOAL -->
+<div class="card">
+  <h2>➕ Add New Goal</h2>
+
+  <form method="post">
+    {% csrf_token %}
+    {{ form.title }}
+    <br><br>
+    <button class="btn-primary">Add Goal</button>
+  </form>
+</div>
+
+<!-- MY GOALS -->
+<div class="card">
+  <h2>📚 My Goals</h2>
+
+  {% for goal in goals %}
+    <div style="
+      padding:12px;
+      margin-bottom:10px;
+      border-radius:10px;
+      background:#f8fafc;
+      border-left:5px solid #6366f1;
+    ">
+      <b>{{ goal.title }}</b><br>
+      <small>Started: {{ goal.created_at|date:"d M Y" }}</small>
+
+      <div style="margin-top:6px;color:#475569;">
+        🔹 Notes coming soon  
+        🔹 Problems coming soon  
+        🔹 Roadmap coming soon
+      </div>
+    </div>
+  {% empty %}
+    <p>No goals yet. Start with one 🎯</p>
+  {% endfor %}
+</div>
+
+</div>
+
+{% endblock %}

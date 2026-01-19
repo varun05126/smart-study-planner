@@ -1,7 +1,9 @@
 from django import forms
-from .models import Task, Subject, Note
 from django.contrib.auth.models import User
+from .models import Task, Subject, Note, LearningGoal
 
+
+# ================= AUTH =================
 
 class SignupForm(forms.Form):
     username = forms.CharField(max_length=150)
@@ -9,25 +11,46 @@ class SignupForm(forms.Form):
     password = forms.CharField(widget=forms.PasswordInput)
 
 
+# ================= SUBJECT =================
+
 class SubjectForm(forms.ModelForm):
     class Meta:
         model = Subject
         fields = ["name"]
+        widgets = {
+            "name": forms.TextInput(attrs={
+                "class": "form-control",
+                "placeholder": "e.g. Data Structures"
+            })
+        }
 
+
+# ================= NOTES =================
 
 class NoteForm(forms.ModelForm):
     class Meta:
         model = Note
         fields = ["title", "subject", "text_content", "file", "visibility"]
         widgets = {
+            "title": forms.TextInput(attrs={
+                "class": "form-control",
+                "placeholder": "Note title"
+            }),
+            "subject": forms.Select(attrs={
+                "class": "form-control"
+            }),
             "text_content": forms.Textarea(attrs={
                 "rows": 5,
+                "class": "form-control",
                 "placeholder": "Write your notes here..."
             }),
+            "visibility": forms.Select(attrs={
+                "class": "form-control"
+            })
         }
 
 
-# ================= TASK FORM =================
+# ================= TASK =================
 
 class TaskForm(forms.ModelForm):
     class Meta:
@@ -47,6 +70,9 @@ class TaskForm(forms.ModelForm):
                 "class": "form-control",
                 "placeholder": "e.g. Complete Unit 3 Notes"
             }),
+            "subject": forms.Select(attrs={
+                "class": "form-control"
+            }),
             "deadline": forms.DateInput(attrs={
                 "type": "date",
                 "class": "form-control"
@@ -59,13 +85,23 @@ class TaskForm(forms.ModelForm):
             "difficulty": forms.Select(attrs={
                 "class": "form-control"
             }),
-            "subject": forms.Select(attrs={
-                "class": "form-control"
-            }),
             "notes": forms.Textarea(attrs={
                 "class": "form-control",
                 "rows": 4,
                 "placeholder": "Optional notes or task description..."
             }),
         }
-        
+
+
+# ================= LEARNING GOALS =================
+
+class LearningGoalForm(forms.ModelForm):
+    class Meta:
+        model = LearningGoal
+        fields = ["title"]
+        widgets = {
+            "title": forms.TextInput(attrs={
+                "class": "form-control",
+                "placeholder": "What do you want to learn today?"
+            })
+        }
