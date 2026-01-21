@@ -11,12 +11,13 @@
 
   <p><b>Today’s study time:</b> {{ today_minutes }} minutes</p>
 
-  {% if active_session %}
-      <a href="{% url 'stop_study' %}" class="btn-primary" style="background:#dc2626;">Stop Study</a>
-      <p style="margin-top:8px;color:#16a34a;">Session running...</p>
-  {% else %}
-      <a href="{% url 'start_study' %}" class="btn-primary">Start Study</a>
-  {% endif %}
+  <a href="{% url 'add_study_session' %}" class="btn-primary">
+      Add Study Session
+  </a>
+
+  <p style="margin-top:8px;color:#16a34a;">
+      Log the time you studied today.
+  </p>
 </div>
 
 <!-- ================= LEARNING GOAL ================= -->
