@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-
+print("✅ CORE URLS LOADED")
 urlpatterns = [
     path("", views.login_view, name="login"),
     path("signup/", views.signup_view, name="signup"),
@@ -25,4 +25,5 @@ urlpatterns = [
     path("study/start/", views.start_study, name="start_study"),
     path("study/stop/", views.stop_study, name="stop_study"),
     path("study/add/", views.add_study_session, name="add_study_session"),
+    path("study/history/", views.study_history, name="study_history"),
 ]
