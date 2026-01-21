@@ -3,13 +3,14 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.utils import timezone
-from .models import StudySession
+from django.db.models import Sum
 from django.db import models
 
-
 from .models import Subject, Task, Note, StudyStreak, LearningGoal, StudySession
-from .forms import SignupForm, SubjectForm, TaskForm, NoteForm, LearningGoalForm, StudySessionForm
-
+from .forms import (
+    SignupForm, SubjectForm, TaskForm, NoteForm,
+    LearningGoalForm, StudySessionForm
+)
 
 # ================= AUTH =================
 
@@ -61,12 +62,12 @@ def dashboard(request):
 
     streak, _ = StudyStreak.objects.get_or_create(user=request.user)
 
-    active_session = StudySession.objects.filter(user=request.user, end_time__isnull=True).first()
+    today = timezone.now().date()
+
     today_minutes = StudySession.objects.filter(
         user=request.user,
-        start_time__date=timezone.now().date(),
-        end_time__isnull=False
-    ).aggregate(models.Sum("duration_minutes"))["duration_minutes__sum"] or 0
+        study_date=today
+    ).aggregate(Sum("duration_minutes"))["duration_minutes__sum"] or 0
 
     return render(request, "core/dashboard.html", {
         "tasks": tasks,
@@ -74,14 +75,13 @@ def dashboard(request):
         "completed_count": completed,
         "pending_count": tasks.filter(completed=False).count(),
         "progress": progress,
-        "streak": streak,
-        "today": timezone.now().date(),
-        "active_session": active_session,
+        "streak": streak.current_streak,
+        "today": today,
         "today_minutes": today_minutes
     })
 
 
-# ================= TASK =================
+# ================= TASKS =================
 
 @login_required
 def add_task(request):
@@ -130,6 +130,15 @@ def toggle_task(request, task_id):
         streak.save()
 
     return redirect("dashboard")
+
+
+@login_required
+def my_tasks(request):
+    tasks = Task.objects.filter(user=request.user).order_by("deadline")
+    return render(request, "core/my_tasks.html", {
+        "tasks": tasks,
+        "today": timezone.now().date()
+    })
 
 
 # ================= NOTES =================
@@ -199,31 +208,29 @@ def learning_goals(request):
         "form": form
     })
 
+
 # ================= PROFILE =================
+
 @login_required
 def profile(request):
     goals = LearningGoal.objects.filter(user=request.user)
     streak, _ = StudyStreak.objects.get_or_create(user=request.user)
 
+    total_minutes = StudySession.objects.filter(
+        user=request.user
+    ).aggregate(Sum("duration_minutes"))["duration_minutes__sum"] or 0
+
     return render(request, "core/profile.html", {
         "goals": goals,
         "streak": streak,
+        "total_minutes": total_minutes
     })
 
-# ================= MY TASKS =================
-@login_required
-def my_tasks(request):
-    tasks = Task.objects.filter(user=request.user).order_by("deadline")
-    return render(request, "core/my_tasks.html", {
-        "tasks": tasks,
-        "today": timezone.now().date()
-    })
 
-# ================= STUDY SESSION =================
+# ================= LIVE STUDY SESSION =================
 
 @login_required
 def start_study(request):
-    # Prevent multiple active sessions
     active = StudySession.objects.filter(user=request.user, end_time__isnull=True).first()
     if not active:
         StudySession.objects.create(user=request.user)
@@ -236,13 +243,28 @@ def stop_study(request):
 
     if session:
         session.end_time = timezone.now()
-        delta = session.end_time - session.start_time
+        delta = session.end_time - session.created_at
         session.duration_minutes = int(delta.total_seconds() / 60)
         session.save()
 
+        # update streak
+        today = timezone.now().date()
+        streak, _ = StudyStreak.objects.get_or_create(user=request.user)
+
+        if streak.last_active == today:
+            pass
+        elif streak.last_active == today - timezone.timedelta(days=1):
+            streak.current_streak += 1
+        else:
+            streak.current_streak = 1
+
+        streak.last_active = today
+        streak.longest_streak = max(streak.longest_streak, streak.current_streak)
+        streak.save()
+
     return redirect("dashboard")
 
-# ---------- STUDY SESSION ----------
+# ================= STUDY SESSION =================
 
 @login_required
 def add_study_session(request):
@@ -251,9 +273,10 @@ def add_study_session(request):
         if form.is_valid():
             session = form.save(commit=False)
             session.user = request.user
+            session.study_date = timezone.now().date()
             session.save()
 
-            # Update streak automatically
+            # ---- Update streak ----
             today = timezone.now().date()
             streak, _ = StudyStreak.objects.get_or_create(user=request.user)
 
@@ -274,3 +297,16 @@ def add_study_session(request):
         form.fields["goal"].queryset = LearningGoal.objects.filter(user=request.user)
 
     return render(request, "core/add_study_session.html", {"form": form})
+
+# ================= STUDY HISTORY =================
+
+@login_required
+def study_history(request):
+    sessions = StudySession.objects.filter(user=request.user).order_by("-study_date", "-created_at")
+
+    total_minutes = sessions.aggregate(models.Sum("duration_minutes"))["duration_minutes__sum"] or 0
+
+    return render(request, "core/study_history.html", {
+        "sessions": sessions,
+        "total_minutes": total_minutes
+    })
