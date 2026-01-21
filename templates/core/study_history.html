@@ -1,0 +1,23 @@
+{% extends "core/base.html" %}
+{% block content %}
+
+<h1>📚 Study History</h1>
+<p>Total time studied: <b>{{ total_minutes }}</b> minutes</p>
+
+<div class="card" style="margin-top:20px;">
+
+{% for s in sessions %}
+  <div style="padding:12px;border-bottom:1px solid #e5e7eb;">
+    <b>{{ s.study_date }}</b> — {{ s.topic }}  
+    <div style="color:#475569;font-size:14px;">
+      {{ s.duration_minutes }} minutes
+      {% if s.goal %} • Goal: {{ s.goal.title }}{% endif %}
+    </div>
+  </div>
+{% empty %}
+  <p>No study sessions logged yet.</p>
+{% endfor %}
+
+</div>
+
+{% endblock %}
