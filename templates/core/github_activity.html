@@ -1,0 +1,142 @@
+{% extends "core/base.html" %}
+{% block content %}
+
+<style>
+.github-wrap {
+    max-width: 1000px;
+    margin: auto;
+}
+
+.github-card {
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 22px;
+    margin-bottom: 22px;
+    box-shadow: 0 8px 22px rgba(0,0,0,0.06);
+}
+
+.github-title {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 6px;
+}
+
+.github-sub {
+    color: #555;
+    margin-bottom: 16px;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(200px,1fr));
+    gap: 16px;
+}
+
+.stat-box {
+    background: linear-gradient(135deg,#eef2ff,#f8fafc);
+    padding: 16px;
+    border-radius: 12px;
+    text-align: center;
+}
+
+.stat-box h2 {
+    margin: 0;
+    font-size: 26px;
+}
+
+.stat-box p {
+    margin: 4px 0 0;
+    color: #555;
+}
+
+.activity-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.activity-table th {
+    text-align: left;
+    padding: 12px;
+    background: #f1f5f9;
+}
+
+.activity-table td {
+    padding: 12px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.badge {
+    background: #2563eb;
+    color: white;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 13px;
+}
+</style>
+
+<div class="github-wrap">
+
+<!-- ================= HEADER ================= -->
+
+<div class="github-card">
+    <div class="github-title">🐙 GitHub Activity</div>
+    <div class="github-sub">
+        Synced development progress from GitHub
+    </div>
+
+    {% if account %}
+        <p><b>Connected account:</b> {{ account.username }}</p>
+        <p><a href="{% url 'sync_github' %}">🔄 Sync now</a></p>
+    {% else %}
+        <p style="color:red;">GitHub not connected.</p>
+    {% endif %}
+</div>
+
+<!-- ================= OVERVIEW ================= -->
+
+<div class="github-card">
+    <h2>📊 Overview</h2>
+    <div class="stats-grid">
+        <div class="stat-box">
+            <h2>{{ total_commits }}</h2>
+            <p>Total commits</p>
+        </div>
+        <div class="stat-box">
+            <h2>{{ total_xp }}</h2>
+            <p>Total XP</p>
+        </div>
+        <div class="stat-box">
+            <h2>{{ activities.count }}</h2>
+            <p>Active days</p>
+        </div>
+    </div>
+</div>
+
+<!-- ================= DAILY ACTIVITY ================= -->
+
+<div class="github-card">
+    <h2>📅 Daily Activity</h2>
+
+    {% if activities %}
+    <table class="activity-table">
+        <tr>
+            <th>Date</th>
+            <th>Commits</th>
+            <th>XP</th>
+        </tr>
+        {% for a in activities %}
+        <tr>
+            <td>{{ a.date }}</td>
+            <td><span class="badge">{{ a.commits }}</span></td>
+            <td>{{ a.xp }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+        <p>No GitHub data yet. Click “Sync now”.</p>
+    {% endif %}
+</div>
+
+</div>
+{% endblock %}
