@@ -2,39 +2,86 @@
 {% block content %}
 
 <h1>🎯 My Learning Goals</h1>
-<p style="color:#64748b;">Tell StudyStack what you want to learn. We’ll help you build it step-by-step.</p>
+<p style="color:#64748b;">
+  Tell StudyStack what you want to learn. We’ll help you build it step-by-step.
+</p>
 
 <br>
 
-<!-- ADD GOAL -->
-<div class="card" style="max-width:500px;margin-bottom:25px;">
+<!-- ================= ADD GOAL ================= -->
+
+<div class="card" style="max-width:520px;margin-bottom:28px;">
   <h3>➕ Add New Goal</h3>
 
   <form method="post">
     {% csrf_token %}
     {{ form.title }}
     <br>
-    <button class="btn-primary" style="margin-top:10px;">Add Goal</button>
+    <button class="btn-primary" style="margin-top:12px;">Add Goal</button>
   </form>
 </div>
 
-<!-- GOALS LIST -->
+
+<!-- ================= GOALS LIST ================= -->
+
 <div class="card">
   <h3>📚 Your Goals</h3>
 
   {% for goal in goals %}
-    <div style="padding:12px;border-radius:12px;background:#f8fafc;margin-bottom:10px;border-left:5px solid #6366f1;">
-      <b>{{ goal.title }}</b><br>
-      <small style="color:#64748b;">Added on {{ goal.created_at|date:"M d, Y" }}</small>
+    <div style="
+      padding:14px;
+      border-radius:14px;
+      background:#f8fafc;
+      margin-bottom:14px;
+      border-left:5px solid #6366f1;
+    ">
 
-      <div style="margin-top:8px;">
-        <span style="font-size:13px;background:#eef2ff;padding:4px 10px;border-radius:20px;">
-          🚀 Learning Mode
-        </span>
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
+        <div>
+          <b style="font-size:17px;">{{ goal.title }}</b><br>
+          <small style="color:#64748b;">
+            Added on {{ goal.created_at|date:"M d, Y" }}
+          </small>
+        </div>
+
+        <!-- STATUS BADGE -->
+        <div>
+          {% if goal.ai_satisfied == True %}
+            <span style="font-size:12px;background:#dcfce7;color:#166534;padding:5px 12px;border-radius:999px;">
+              ✅ Satisfied
+            </span>
+          {% elif goal.ai_satisfied == False %}
+            <span style="font-size:12px;background:#fee2e2;color:#991b1b;padding:5px 12px;border-radius:999px;">
+              🔁 Improving
+            </span>
+          {% else %}
+            <span style="font-size:12px;background:#eef2ff;color:#3730a3;padding:5px 12px;border-radius:999px;">
+              🚀 New
+            </span>
+          {% endif %}
+        </div>
       </div>
+
+      <!-- ACTIONS -->
+      <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;">
+
+        <a href="{% url 'start_learning' goal.id %}"
+           class="btn-primary"
+           style="font-size:14px;padding:7px 14px;">
+           ▶ Start Learning
+        </a>
+
+        {% if goal.ai_solution %}
+          <span style="font-size:13px;color:#16a34a;align-self:center;">
+            AI roadmap generated
+          </span>
+        {% endif %}
+
+      </div>
+
     </div>
   {% empty %}
-    <p>No goals yet. Add one and start building your stack.</p>
+    <p style="color:#64748b;">No goals yet. Add one and start building your stack.</p>
   {% endfor %}
 </div>
 
