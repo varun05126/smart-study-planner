@@ -1,0 +1,283 @@
+{% extends "core/base.html" %}
+{% block content %}
+
+<style>
+
+/* ======================================================
+   TASK DETAIL – PREMIUM AI CHAT UI
+   ====================================================== */
+
+.page-wrap {
+    max-width: 980px;
+    margin: auto;
+    padding: 3.5rem 1.5rem 5rem;
+}
+
+/* ---------------- TASK CARD ---------------- */
+
+.task-card {
+    background: var(--card);
+    border-radius: 26px;
+    padding: 2.8rem 3rem;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-md);
+}
+
+.task-title {
+    font-size: 2rem;
+    font-weight: 900;
+    letter-spacing: -0.6px;
+}
+
+.task-meta {
+    color: var(--muted);
+    font-size: 0.95rem;
+    margin-top: .4rem;
+    font-weight: 500;
+}
+
+.badge {
+    padding: 8px 16px;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 800;
+    letter-spacing: .3px;
+}
+
+.badge.done {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.badge.pending {
+    background: #fff7ed;
+    color: #9a3412;
+}
+
+/* ---------------- CHAT CARD ---------------- */
+
+.chat-card {
+    margin-top: 3rem;
+    background: var(--card);
+    border-radius: 28px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-lg);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.chat-header {
+    padding: 1.6rem 2.2rem;
+    border-bottom: 1px solid var(--border);
+    font-size: 1.35rem;
+    font-weight: 900;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* ---------------- CHAT BOX ---------------- */
+
+.chat-box {
+    padding: 2rem;
+    background:
+      radial-gradient(600px 200px at top left, #eef2ff, transparent 60%),
+      linear-gradient(180deg,#f9faff,#ffffff);
+    height: 460px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+}
+
+body.dark .chat-box {
+    background: linear-gradient(180deg,#020617,#020617);
+}
+
+/* ---------------- CHAT BUBBLES ---------------- */
+
+.msg {
+    max-width: 78%;
+    padding: 15px 18px;
+    border-radius: 20px;
+    line-height: 1.7;
+    font-size: 0.95rem;
+    white-space: pre-wrap;
+    box-shadow: var(--shadow-sm);
+}
+
+.ai-msg {
+    background: #f1f5ff;
+    border: 1px solid #e3e9ff;
+    border-bottom-left-radius: 6px;
+}
+
+body.dark .ai-msg {
+    background: #020617;
+    border: 1px solid #1e293b;
+}
+
+.user-msg {
+    margin-left: auto;
+    background: linear-gradient(135deg,#4f46e5,#6366f1);
+    color: white;
+    border-bottom-right-radius: 6px;
+}
+
+/* ---------------- INPUT BAR ---------------- */
+
+.chat-input {
+    padding: 1.4rem 1.8rem;
+    border-top: 1px solid var(--border);
+    display: flex;
+    gap: 14px;
+    background: var(--card);
+}
+
+.chat-input input {
+    flex: 1;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    padding: 13px 16px;
+    font-size: 0.95rem;
+    background: transparent;
+    color: var(--text);
+}
+
+.chat-input input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px #6366f133;
+}
+
+.send-btn {
+    background: linear-gradient(135deg,#4f46e5,#6366f1);
+    color: white;
+    border-radius: 14px;
+    padding: 13px 26px;
+    font-weight: 800;
+    border: none;
+    cursor: pointer;
+    transition: 0.25s;
+    box-shadow: 0 12px 28px rgba(79,70,229,.35);
+}
+
+.send-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 22px 50px rgba(79,70,229,.45);
+}
+
+/* ---------------- FOOTER ---------------- */
+
+.chat-footer {
+    padding: .9rem 1.8rem;
+    font-size: .82rem;
+    color: var(--muted);
+    display: flex;
+    justify-content: space-between;
+}
+
+.chat-footer a {
+    font-weight: 700;
+}
+
+/* ---------------- SCROLLBAR ---------------- */
+
+.chat-box::-webkit-scrollbar {
+  width: 8px;
+}
+
+.chat-box::-webkit-scrollbar-thumb {
+  background: #c7d2fe;
+  border-radius: 20px;
+}
+
+body.dark .chat-box::-webkit-scrollbar-thumb {
+  background: #1e293b;
+}
+
+</style>
+
+
+<div class="page-wrap">
+
+<!-- ================= TASK CARD ================= -->
+
+<div class="task-card">
+
+    <div style="display:flex;justify-content:space-between;align-items:start;gap:20px;">
+        <div>
+            <div class="task-title">📘 {{ task.title }}</div>
+            <div class="task-meta">
+                {{ task.custom_subject|default:task.subject }} • {{ task.get_task_type_display }}
+                {% if task.deadline %} • Due {{ task.deadline }}{% endif %}
+            </div>
+        </div>
+
+        {% if task.completed %}
+            <span class="badge done">✔ COMPLETED</span>
+        {% else %}
+            <span class="badge pending">⏳ PENDING</span>
+        {% endif %}
+    </div>
+
+    <hr style="margin:2rem 0;border-color:var(--border);">
+
+    {% if task.material %}
+        <a href="{{ task.material.url }}" target="_blank" style="color:var(--primary);font-weight:700;">
+            📎 Open uploaded file
+        </a>
+    {% else %}
+        <p style="color:var(--muted);font-size:.9rem;">No file uploaded.</p>
+    {% endif %}
+
+</div>
+
+
+<!-- ================= AI CHAT ================= -->
+
+<div class="chat-card">
+
+    <div class="chat-header">🤖 AI Task Assistant</div>
+
+    <div class="chat-box" id="chatBox">
+
+        {% for msg in messages %}
+            {% if msg.sender == "user" %}
+                <div class="msg user-msg">{{ msg.content }}</div>
+            {% else %}
+                <div class="msg ai-msg">{{ msg.content }}</div>
+            {% endif %}
+        {% empty %}
+            <div class="msg ai-msg">
+                👋 Hi {{ request.user.username }},  
+                I’m your personal study assistant.  
+                Ask anything about this task — explanations, solutions, quizzes, or revisions.
+            </div>
+        {% endfor %}
+
+    </div>
+
+    <form method="POST" action="{% url 'task_detail' task.id %}" class="chat-input">
+        {% csrf_token %}
+        <input type="text" name="message" required minlength="1"
+               placeholder="Ask something about this task…">
+        <button type="submit" class="send-btn">Send</button>
+    </form>
+
+    <div class="chat-footer">
+        <span>Modes: Explain • Solve • Quiz • Revise • Examples</span>
+        <a href="{% url 'tasks_hub' %}">← Back to tasks</a>
+    </div>
+
+</div>
+
+</div>
+
+<script>
+const chatBox = document.getElementById("chatBox");
+chatBox.scrollTop = chatBox.scrollHeight;
+</script>
+
+{% endblock %}
