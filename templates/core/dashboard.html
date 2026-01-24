@@ -2,11 +2,11 @@
 {% block content %}
 
 <h1>Welcome back 👋</h1>
-<p>Here’s your study overview.</p>
+<p class="page-subtitle">Here’s your study overview.</p>
 
 <!-- ================= STUDY SESSION ================= -->
 
-<div class="card" style="margin-bottom:22px;">
+<div class="card">
   <h2>⏱ Study Session</h2>
 
   <p><b>Today’s study time:</b> {{ today_minutes }} minutes</p>
@@ -22,7 +22,7 @@
 
 <!-- ================= LEARNING GOAL ================= -->
 
-<div class="card" style="margin-bottom:22px;">
+<div class="card">
   <h2>🎯 What do you want to learn?</h2>
 
   <form method="POST" action="{% url 'learning_goals' %}">
@@ -30,7 +30,7 @@
     <div style="display:flex;gap:12px;flex-wrap:wrap;">
       <input type="text" name="title" required
              placeholder="e.g. Data Structures, Python, AI, Web Development"
-             style="flex:1;padding:10px;border-radius:10px;border:1px solid #e5e7eb;">
+             style="flex:1;">
       <button class="btn-primary">Save Goal</button>
     </div>
   </form>
@@ -38,25 +38,27 @@
   {% if current_goal %}
     <p style="margin-top:12px;">
       <strong>Current focus:</strong> 
-      <span style="color:#4f46e5;">{{ current_goal.title }}</span>
+      <span style="color:#6366f1;">{{ current_goal.title }}</span>
     </p>
   {% endif %}
 
-  <div style="margin-top:14px;color:#475569;font-size:14px;">
+  <div style="margin-top:14px;color:var(--muted);font-size:14px;">
     Popular paths: DSA • Web Dev • AI/ML • Cybersecurity • Core CS • Aptitude
   </div>
 </div>
 
 <!-- ================= PROGRESS ================= -->
 
-<div class="card" style="margin-bottom:20px;">
+<div class="card">
   <h3>Overall Progress</h3>
-  <div style="background:#e5e7eb;border-radius:20px;overflow:hidden;">
-    <div style="width:{{ progress|default:0 }}%;background:#4f46e5;color:white;padding:6px 10px;">
+  <div class="progress-bar">
+    <div class="progress-fill" style="width:{{ progress|default:0 }}%;">
       {{ progress|default:0 }}%
     </div>
   </div>
 </div>
+
+<!-- ================= STATS ================= -->
 
 <div class="grid-4">
   <div class="card"><h3>Total Tasks</h3><p>{{ total_tasks }}</p></div>
@@ -67,43 +69,54 @@
 
 <br>
 
+<!-- ================= TASKS + TIPS ================= -->
+
 <div class="grid-2">
+
+<!-- ===== TASKS ===== -->
 
 <div class="card">
 <h2>Your Tasks</h2>
 
 {% for task in tasks %}
-  <div style="
-    padding:12px;
-    border-radius:10px;
-    margin-bottom:10px;
-    background:{% if task.completed %}#ecfdf5{% elif task.deadline < today %}#fef2f2{% else %}#f8fafc{% endif %};
-    border-left:5px solid {% if task.completed %}#10b981{% elif task.deadline < today %}#ef4444{% else %}#6366f1{% endif %};
-  ">
+
+  <div class="task-box 
+       {% if task.completed %}
+          task-done
+       {% elif task.deadline < today %}
+          task-overdue
+       {% else %}
+          task-pending
+       {% endif %}">
 
     <b>{{ task.title }}</b> — {{ task.subject.name }} <br>
-    Deadline: {{ task.deadline }}
+    <span style="font-size:13px;color:var(--muted);">
+      Deadline: {{ task.deadline }}
+    </span>
 
     {% if task.deadline < today and not task.completed %}
-      <span style="color:#dc2626;font-weight:600;">(Overdue)</span>
+      <span style="color:#ef4444;font-weight:700;">(Overdue)</span>
     {% endif %}
 
-    <div style="margin-top:8px;">
-      <a href="{% url 'toggle_task' task.id %}" class="btn-primary" style="padding:6px 12px;">
+    <div style="margin-top:10px;">
+      <a href="{% url 'toggle_task' task.id %}" class="btn-primary" style="padding:6px 14px;font-size:13px;">
         {% if task.completed %}↩ Undo{% else %}✔ Complete{% endif %}
       </a>
     </div>
 
   </div>
+
 {% empty %}
-  <p>No tasks yet. Start adding 🚀</p>
+  <p style="color:var(--muted);">No tasks yet. Start adding 🚀</p>
 {% endfor %}
 
 </div>
 
+<!-- ===== QUICK TIPS ===== -->
+
 <div class="card">
   <h2>Quick Tips</h2>
-  <ul>
+  <ul style="line-height:1.9;">
     <li>✔ Break tasks into small parts</li>
     <li>✔ Revise daily</li>
     <li>✔ Don’t overload a single day</li>
