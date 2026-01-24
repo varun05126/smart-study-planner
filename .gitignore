@@ -13,3 +13,5 @@ db.sqlite3
 venv/
 .DS_Store
 */.DS_Store
+tasks/
+.DS_Store
