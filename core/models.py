@@ -43,16 +43,18 @@ class Resource(models.Model):
         ("video", "YouTube / Video"),
         ("article", "Article / Blog"),
         ("course", "Course"),
-        ("book", "Book"),
+        ("book", "Book / PDF"),
         ("docs", "Documentation"),
         ("notes", "Notes"),
+        ("practice", "Practice Platform"),
     ]
 
     topic = models.ForeignKey(Topic, on_delete=models.CASCADE, related_name="resources")
-    title = models.CharField(max_length=200)
+    title = models.CharField(max_length=255)
     url = models.URLField()
-    type = models.CharField(max_length=12, choices=RESOURCE_TYPES)
+    type = models.CharField(max_length=15, choices=RESOURCE_TYPES)
     is_best = models.BooleanField(default=False)
+    short_description = models.TextField(blank=True)
 
     def __str__(self):
         return self.title
@@ -67,7 +69,7 @@ class Problem(models.Model):
 
     topic = models.ForeignKey(Topic, on_delete=models.CASCADE, related_name="problems")
     title = models.CharField(max_length=200)
-    platform = models.CharField(max_length=50)  # LeetCode, GFG, Codeforces
+    platform = models.CharField(max_length=50)
     url = models.URLField()
     difficulty = models.CharField(max_length=10, choices=DIFFICULTY)
 
@@ -101,17 +103,68 @@ class UserTopicProgress(models.Model):
 # ==================================================
 
 class Task(models.Model):
+
+    TASK_TYPES = [
+        ("assignment", "Assignment"),
+        ("study", "Study"),
+        ("revision", "Revision"),
+        ("project", "Project"),
+        ("exam", "Exam Prep"),
+        ("reading", "Reading"),
+        ("other", "Other"),
+    ]
+
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="tasks")
+
     title = models.CharField(max_length=200)
-    subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
-    deadline = models.DateField()
-    estimated_hours = models.DecimalField(max_digits=4, decimal_places=1)
+
+    subject = models.ForeignKey(Subject, on_delete=models.SET_NULL, null=True, blank=True)
+    custom_subject = models.CharField(max_length=150, blank=True)
+
+    task_type = models.CharField(max_length=20, choices=TASK_TYPES, default="study")
+
+    material = models.FileField(upload_to="tasks/", blank=True, null=True)
+
+    deadline = models.DateField(null=True, blank=True)
+    estimated_hours = models.DecimalField(max_digits=4, decimal_places=1, null=True, blank=True)
+
     completed = models.BooleanField(default=False)
+
+    # AI
+    needs_help = models.BooleanField(default=False)
+    ai_solution = models.TextField(blank=True)
+
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.title
 
+
+# ==================================================
+#              TASK AI CHAT SYSTEM
+# ==================================================
+
+class TaskMessage(models.Model):
+    SENDER = [
+        ("user", "User"),
+        ("ai", "AI"),
+    ]
+
+    task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name="messages")
+    sender = models.CharField(max_length=10, choices=SENDER)
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["created_at"]
+
+    def __str__(self):
+        return f"{self.task.title} - {self.sender}"
+
+
+# ==================================================
+#                     NOTES
+# ==================================================
 
 class Note(models.Model):
     VISIBILITY = [("private", "Private"), ("public", "Public")]
@@ -141,10 +194,9 @@ class LearningGoal(models.Model):
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="goals")
     title = models.CharField(max_length=200)
-
     status = models.CharField(max_length=15, choices=STATUS, default="planned")
 
-    ai_solution = models.TextField(blank=True, default="")
+    ai_solution = models.TextField(blank=True)
     is_satisfied = models.BooleanField(null=True, blank=True)
     satisfaction_note = models.TextField(blank=True)
 
