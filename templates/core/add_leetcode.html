@@ -1,0 +1,50 @@
+{% extends "core/base.html" %}
+{% block content %}
+
+<style>
+.connect-box{
+  max-width:420px;
+  margin:80px auto;
+  background:var(--card);
+  padding:30px;
+  border-radius:18px;
+  border:1px solid var(--border);
+  box-shadow:var(--shadow-md);
+  text-align:center;
+}
+.connect-box h2{margin-bottom:10px}
+.connect-box p{color:var(--muted);font-size:14px}
+.connect-box input{
+  width:100%;
+  padding:12px;
+  margin-top:15px;
+  border-radius:10px;
+  border:1px solid var(--border);
+  background:var(--soft);
+  color:inherit;
+}
+.connect-box button{
+  margin-top:18px;
+  width:100%;
+}
+</style>
+
+<div class="connect-box">
+  <h2>💡 Connect LeetCode</h2>
+  <p>Enter your LeetCode username to sync solved problems.</p>
+
+  <form method="post">
+    {% csrf_token %}
+
+    <input 
+      type="text" 
+      name="username" 
+      placeholder="LeetCode username" 
+      required
+    >
+
+    <button type="submit" class="btn-primary">Connect</button>
+  </form>
+</div>
+
+{% endblock %}
