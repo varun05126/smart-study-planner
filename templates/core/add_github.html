@@ -1,0 +1,82 @@
+{% extends "core/base.html" %}
+{% block content %}
+
+<style>
+.connect-wrap{
+  max-width:420px;
+  margin:70px auto;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:22px;
+  padding:28px 30px;
+  box-shadow:var(--shadow-md);
+  animation:fadeIn .4s ease;
+}
+
+@keyframes fadeIn{
+  from{opacity:0;transform:translateY(10px)}
+  to{opacity:1;transform:none}
+}
+
+.connect-wrap h2{
+  margin:0 0 6px;
+  font-size:1.7rem;
+  font-weight:900;
+  letter-spacing:-.4px;
+}
+
+.connect-wrap p{
+  color:var(--muted);
+  margin-bottom:16px;
+  font-size:14px;
+  line-height:1.5;
+}
+
+.connect-wrap input{
+  width:100%;
+  padding:12px 14px;
+  border-radius:12px;
+  border:1px solid var(--border);
+  background:transparent;
+  color:var(--text);
+  margin-top:6px;
+  font-size:14px;
+}
+
+.connect-wrap input:focus{
+  outline:none;
+  border-color:var(--primary);
+}
+
+.connect-actions{
+  margin-top:20px;
+  display:flex;
+  gap:12px;
+}
+
+.connect-actions .btn-primary,
+.connect-actions .btn-secondary{
+  flex:1;
+  text-align:center;
+}
+</style>
+
+<div class="connect-wrap">
+
+  <h2>🐙 Connect GitHub</h2>
+  <p>Enter your GitHub username to sync public contributions and track coding activity.</p>
+
+  <form method="post" action="{% url 'add_github' %}">
+    {% csrf_token %}
+    
+    {{ form.username }}
+
+    <div class="connect-actions">
+      <button type="submit" class="btn-primary">🔗 Connect</button>
+      <a href="{% url 'profile' %}" class="btn-secondary">Cancel</a>
+    </div>
+  </form>
+
+</div>
+
+{% endblock %}
