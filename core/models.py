@@ -115,22 +115,18 @@ class Task(models.Model):
     ]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="tasks")
-
     title = models.CharField(max_length=200)
 
     subject = models.ForeignKey(Subject, on_delete=models.SET_NULL, null=True, blank=True)
     custom_subject = models.CharField(max_length=150, blank=True)
 
     task_type = models.CharField(max_length=20, choices=TASK_TYPES, default="study")
-
     material = models.FileField(upload_to="tasks/", blank=True, null=True)
 
     deadline = models.DateField(null=True, blank=True)
     estimated_hours = models.DecimalField(max_digits=4, decimal_places=1, null=True, blank=True)
-
     completed = models.BooleanField(default=False)
 
-    # AI
     needs_help = models.BooleanField(default=False)
     ai_solution = models.TextField(blank=True)
 
@@ -145,10 +141,7 @@ class Task(models.Model):
 # ==================================================
 
 class TaskMessage(models.Model):
-    SENDER = [
-        ("user", "User"),
-        ("ai", "AI"),
-    ]
+    SENDER = [("user", "User"), ("ai", "AI")]
 
     task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name="messages")
     sender = models.CharField(max_length=10, choices=SENDER)
@@ -186,11 +179,7 @@ class Note(models.Model):
 # ==================================================
 
 class LearningGoal(models.Model):
-    STATUS = [
-        ("planned", "Planned"),
-        ("learning", "Learning"),
-        ("completed", "Completed"),
-    ]
+    STATUS = [("planned", "Planned"), ("learning", "Learning"), ("completed", "Completed")]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="goals")
     title = models.CharField(max_length=200)
@@ -232,14 +221,14 @@ class StudyStreak(models.Model):
 
 
 # ==================================================
-#           MULTI-PLATFORM TRACKING SYSTEM
+#           MULTI-PLATFORM ACTIVITY ENGINE
 # ==================================================
 
 class Platform(models.Model):
     name = models.CharField(max_length=50, unique=True)
     slug = models.SlugField(unique=True)
     base_url = models.URLField(blank=True)
-    is_oauth = models.BooleanField(default=False)
+    uses_public_api = models.BooleanField(default=True)
     is_active = models.BooleanField(default=True)
 
     def __str__(self):
@@ -250,12 +239,8 @@ class PlatformAccount(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="platform_accounts")
     platform = models.ForeignKey(Platform, on_delete=models.CASCADE, related_name="accounts")
 
-    platform_user_id = models.CharField(max_length=150, blank=True)
     username = models.CharField(max_length=150)
     profile_url = models.URLField(blank=True)
-
-    access_token = models.TextField(blank=True, null=True)
-    refresh_token = models.TextField(blank=True, null=True)
 
     connected_at = models.DateTimeField(auto_now_add=True)
     last_synced = models.DateTimeField(null=True, blank=True)
@@ -264,7 +249,7 @@ class PlatformAccount(models.Model):
         unique_together = ("user", "platform")
 
     def __str__(self):
-        return f"{self.user} → {self.platform.name}"
+        return f"{self.user} → {self.platform.name} ({self.username})"
 
 
 class DailyActivity(models.Model):
@@ -302,8 +287,70 @@ class UserHeatmap(models.Model):
 class UserStats(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="stats")
 
+    # -------------------
+    # PLATFORM USERNAMES
+    # -------------------
+    github_username = models.CharField(max_length=150, blank=True, null=True)
+    leetcode_username = models.CharField(max_length=150, blank=True, null=True)
+    gfg_username = models.CharField(max_length=150, blank=True, null=True)
+    codeforces_username = models.CharField(max_length=150, blank=True, null=True)
+    hackerrank_username = models.CharField(max_length=150, blank=True, null=True)
+
+    # -------------------
+    # GITHUB
+    # -------------------
+    total_commits = models.PositiveIntegerField(default=0)
+
+    # -------------------
+    # LEETCODE
+    # -------------------
+    leetcode_solved = models.PositiveIntegerField(default=0)
+    leetcode_xp = models.PositiveIntegerField(default=0)
+
+    # -------------------
+    # GFG
+    # -------------------
+    gfg_solved = models.IntegerField(default=0)
+    gfg_xp = models.IntegerField(default=0)
+
+    # -------------------
+    # CODEFORCES
+    # -------------------
+    codeforces_solved = models.IntegerField(default=0)
+    codeforces_xp = models.IntegerField(default=0)
+
+    # -------------------
+    # HACKERRANK
+    # -------------------
+    hackerrank_solved = models.IntegerField(default=0)
+    hackerrank_xp = models.IntegerField(default=0)
+
+    # -------------------
+    # GLOBAL STATS
+    # -------------------
+    total_xp = models.PositiveIntegerField(default=0)
+    total_problems = models.PositiveIntegerField(default=0)
+    total_hours = models.DecimalField(max_digits=6, decimal_places=2, default=0)
+
+    # -------------------
+    # STREAK + LEVEL
+    # -------------------
+    current_streak = models.PositiveIntegerField(default=0)
+    longest_streak = models.PositiveIntegerField(default=0)
+    level = models.PositiveIntegerField(default=1)
+
+    last_updated = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.user} - {self.total_xp} XP"
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="stats")
+
     total_xp = models.PositiveIntegerField(default=0)
     total_commits = models.PositiveIntegerField(default=0)
+
+    leetcode_solved = models.IntegerField(default=0)
+    leetcode_xp = models.IntegerField(default=0)
+    
     total_problems = models.PositiveIntegerField(default=0)
     total_hours = models.DecimalField(max_digits=6, decimal_places=2, default=0)
 
