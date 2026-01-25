@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 
 from .models import (
     Subject,
@@ -8,60 +9,84 @@ from .models import (
     Note,
     LearningGoal,
     StudySession,
+    PlatformAccount,
 )
 
-
-# ================= AUTH =================
+# ==================================================
+# AUTH
+# ==================================================
 
 class SignupForm(forms.Form):
-    username = forms.CharField(max_length=150)
-    email = forms.EmailField()
-    password = forms.CharField(widget=forms.PasswordInput)
+    username = forms.CharField(
+        max_length=150,
+        widget=forms.TextInput(attrs={
+            "placeholder": "Choose a username",
+            "autocomplete": "off"
+        })
+    )
+    email = forms.EmailField(
+        widget=forms.EmailInput(attrs={
+            "placeholder": "Enter your email"
+        })
+    )
+    password = forms.CharField(
+        widget=forms.PasswordInput(attrs={
+            "placeholder": "Create a strong password"
+        })
+    )
+
+    def clean_username(self):
+        username = self.cleaned_data["username"].strip()
+        if User.objects.filter(username=username).exists():
+            raise ValidationError("This username is already taken.")
+        return username
+
+    def clean_email(self):
+        email = self.cleaned_data["email"].strip().lower()
+        if User.objects.filter(email=email).exists():
+            raise ValidationError("This email is already registered.")
+        return email
 
 
-# ================= SUBJECT =================
+# ==================================================
+# SUBJECT
+# ==================================================
 
 class SubjectForm(forms.ModelForm):
     class Meta:
         model = Subject
-        fields = ["name"]
+        fields = ["track", "name"]
         widgets = {
+            "track": forms.Select(),
             "name": forms.TextInput(attrs={
-                "class": "form-control",
                 "placeholder": "e.g. Data Structures"
             })
         }
 
 
-# ================= NOTES =================
+# ==================================================
+# NOTES
+# ==================================================
 
 class NoteForm(forms.ModelForm):
     class Meta:
         model = Note
         fields = ["title", "topic", "text_content", "file", "visibility"]
         widgets = {
-            "title": forms.TextInput(attrs={
-                "class": "form-control",
-                "placeholder": "Note title"
-            }),
-            "topic": forms.Select(attrs={
-                "class": "form-control"
-            }),
+            "title": forms.TextInput(attrs={"placeholder": "Note title"}),
+            "topic": forms.Select(),
             "text_content": forms.Textarea(attrs={
                 "rows": 5,
-                "class": "form-control",
                 "placeholder": "Write your notes here..."
             }),
-            "visibility": forms.Select(attrs={
-                "class": "form-control"
-            }),
-            "file": forms.ClearableFileInput(attrs={
-                "class": "form-control"
-            }),
+            "visibility": forms.Select(),
+            "file": forms.ClearableFileInput(),
         }
 
 
-# ================= TASK =================
+# ==================================================
+# TASK
+# ==================================================
 
 class TaskForm(forms.ModelForm):
     class Meta:
@@ -74,72 +99,105 @@ class TaskForm(forms.ModelForm):
             "material",
             "deadline",
             "estimated_hours",
-            "completed",
         ]
 
         widgets = {
             "title": forms.TextInput(attrs={
-                "class": "form-control",
                 "placeholder": "e.g. DSA Assignment – Arrays"
             }),
-
-            "subject": forms.Select(attrs={
-                "class": "form-control"
-            }),
-
+            "subject": forms.Select(),
             "custom_subject": forms.TextInput(attrs={
-                "class": "form-control",
-                "placeholder": "Or enter subject manually (e.g. Engineering Chemistry)"
+                "placeholder": "Or enter subject manually"
             }),
-
-            "task_type": forms.Select(attrs={
-                "class": "form-control"
-            }),
-
-            "material": forms.ClearableFileInput(attrs={
-                "class": "form-control"
-            }),
-
-            "deadline": forms.DateInput(attrs={
-                "type": "date",
-                "class": "form-control"
-            }),
-
+            "task_type": forms.Select(),
+            "material": forms.ClearableFileInput(),
+            "deadline": forms.DateInput(attrs={"type": "date"}),
             "estimated_hours": forms.NumberInput(attrs={
-                "class": "form-control",
                 "step": "0.5",
                 "placeholder": "e.g. 2.5"
             }),
         }
 
+    def clean(self):
+        cleaned = super().clean()
+        subject = cleaned.get("subject")
+        custom = cleaned.get("custom_subject")
 
-# ================= LEARNING GOALS =================
+        if not subject and not custom:
+            raise ValidationError("Please select a subject or enter one manually.")
+
+        return cleaned
+
+
+# ==================================================
+# LEARNING GOALS
+# ==================================================
 
 class LearningGoalForm(forms.ModelForm):
     class Meta:
         model = LearningGoal
-        fields = ["title"]
+        fields = ["title", "status"]
         widgets = {
             "title": forms.TextInput(attrs={
-                "class": "form-control",
                 "placeholder": "What do you want to learn?"
-            })
+            }),
+            "status": forms.Select()
         }
 
 
-# ================= STUDY SESSION =================
+# ==================================================
+# STUDY SESSION
+# ==================================================
 
 class StudySessionForm(forms.ModelForm):
     class Meta:
         model = StudySession
         fields = ["topic", "duration_minutes"]
         widgets = {
-            "topic": forms.Select(attrs={
-                "class": "form-control"
-            }),
+            "topic": forms.Select(),
             "duration_minutes": forms.NumberInput(attrs={
-                "class": "form-control",
                 "placeholder": "Time in minutes (e.g. 45)"
             }),
         }
-        
+
+    def clean_duration_minutes(self):
+        minutes = self.cleaned_data["duration_minutes"]
+        if minutes <= 0:
+            raise ValidationError("Study time must be greater than zero.")
+        return minutes
+
+
+# ==================================================
+# PLATFORM ACCOUNT (GENERIC USERNAME LINK)
+# ==================================================
+
+class PlatformAccountForm(forms.ModelForm):
+    class Meta:
+        model = PlatformAccount
+        fields = ["username"]
+        widgets = {
+            "username": forms.TextInput(attrs={
+                "placeholder": "Enter your platform username (e.g. octocat)"
+            })
+        }
+
+
+# ==================================================
+# GITHUB USERNAME (PUBLIC API SYNC)
+# ==================================================
+
+class GitHubUsernameForm(forms.Form):
+    username = forms.CharField(
+        max_length=150,
+        widget=forms.TextInput(attrs={
+            "placeholder": "Enter your GitHub username",
+            "class": "form-control"
+        })
+    )
+
+    def clean_username(self):
+        username = self.cleaned_data["username"].strip()
+        if " " in username:
+            raise ValidationError("GitHub username cannot contain spaces.")
+        return username
+    
