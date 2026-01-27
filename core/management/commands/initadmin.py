@@ -5,12 +5,16 @@ import os
 User = get_user_model()
 
 class Command(BaseCommand):
-    help = "Create default admin if not exists"
+    help = "Create default admin user from env vars"
 
     def handle(self, *args, **kwargs):
-        username = os.getenv("DJANGO_ADMIN_USER", "Varun)5126")
-        email = os.getenv("DJANGO_ADMIN_EMAIL", "malthumkarvarun@gmail.com")
-        password = os.getenv("DJANGO_ADMIN_PASSWORD", "Varun05126")
+        username = os.environ.get("DJANGO_ADMIN_USER")
+        email = os.environ.get("DJANGO_ADMIN_EMAIL")
+        password = os.environ.get("DJANGO_ADMIN_PASSWORD")
+
+        if not all([username, email, password]):
+            self.stdout.write("Admin init skipped: env vars not set")
+            return
 
         if not User.objects.filter(username=username).exists():
             User.objects.create_superuser(username, email, password)
