@@ -49,7 +49,7 @@ if not GROQ_API_KEY:
 # --------------------------------------------------
 # SECURITY
 # --------------------------------------------------
-SECRET_KEY = 'django-insecure-=$=5-y$oz(7pn130!u!snby1%51cr20&cqbv&-x!6hisy1qua!'
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "@%xir=1m#dkf7vx@c+0x4le-=lpn*!yj#x(#o^1$0o4n#f%si8")
 
 #debug mode should be False in production
 DEBUG = True
