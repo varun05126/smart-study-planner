@@ -159,4 +159,4 @@ ALLOWED_HOSTS = [
 
 LOGIN_URL = "/login/"
 LOGIN_REDIRECT_URL = "/dashboard/"
-LOGOUT_REDIRECT_URL = "/login/
+LOGOUT_REDIRECT_URL = "/login/"
