@@ -164,14 +164,15 @@ class Note(models.Model):
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="notes")
     topic = models.ForeignKey(Topic, on_delete=models.SET_NULL, null=True, blank=True)
+
+    subject = models.CharField(max_length=150, blank=True)  # ✅ NEW
+
     title = models.CharField(max_length=200)
     text_content = models.TextField(blank=True)
     file = models.FileField(upload_to="notes/", blank=True, null=True)
     visibility = models.CharField(max_length=10, choices=VISIBILITY, default="private")
     created_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return self.title
+    
 
 
 # ==================================================
@@ -288,7 +289,7 @@ class UserStats(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="stats")
 
     # -------------------
-    # PLATFORM USERNAMES
+    # PLATFORM USERNAMES (optional, helper cache)
     # -------------------
     github_username = models.CharField(max_length=150, blank=True, null=True)
     leetcode_username = models.CharField(max_length=150, blank=True, null=True)
@@ -300,6 +301,7 @@ class UserStats(models.Model):
     # GITHUB
     # -------------------
     total_commits = models.PositiveIntegerField(default=0)
+    github_xp = models.PositiveIntegerField(default=0)
 
     # -------------------
     # LEETCODE
@@ -310,23 +312,23 @@ class UserStats(models.Model):
     # -------------------
     # GFG
     # -------------------
-    gfg_solved = models.IntegerField(default=0)
-    gfg_xp = models.IntegerField(default=0)
+    gfg_solved = models.PositiveIntegerField(default=0)
+    gfg_xp = models.PositiveIntegerField(default=0)
 
     # -------------------
     # CODEFORCES
     # -------------------
-    codeforces_solved = models.IntegerField(default=0)
-    codeforces_xp = models.IntegerField(default=0)
+    codeforces_solved = models.PositiveIntegerField(default=0)
+    codeforces_xp = models.PositiveIntegerField(default=0)
 
     # -------------------
     # HACKERRANK
     # -------------------
-    hackerrank_solved = models.IntegerField(default=0)
-    hackerrank_xp = models.IntegerField(default=0)
+    hackerrank_solved = models.PositiveIntegerField(default=0)
+    hackerrank_xp = models.PositiveIntegerField(default=0)
 
     # -------------------
-    # GLOBAL STATS
+    # GLOBAL TOTALS
     # -------------------
     total_xp = models.PositiveIntegerField(default=0)
     total_problems = models.PositiveIntegerField(default=0)
@@ -335,25 +337,6 @@ class UserStats(models.Model):
     # -------------------
     # STREAK + LEVEL
     # -------------------
-    current_streak = models.PositiveIntegerField(default=0)
-    longest_streak = models.PositiveIntegerField(default=0)
-    level = models.PositiveIntegerField(default=1)
-
-    last_updated = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return f"{self.user} - {self.total_xp} XP"
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="stats")
-
-    total_xp = models.PositiveIntegerField(default=0)
-    total_commits = models.PositiveIntegerField(default=0)
-
-    leetcode_solved = models.IntegerField(default=0)
-    leetcode_xp = models.IntegerField(default=0)
-    
-    total_problems = models.PositiveIntegerField(default=0)
-    total_hours = models.DecimalField(max_digits=6, decimal_places=2, default=0)
-
     current_streak = models.PositiveIntegerField(default=0)
     longest_streak = models.PositiveIntegerField(default=0)
     level = models.PositiveIntegerField(default=1)
