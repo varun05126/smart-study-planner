@@ -11,29 +11,36 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 """
-Django settings for config project.
-Django 5.2
+Django settings for StudyStack project.
+Production-ready configuration.
 """
 
 from pathlib import Path
-
 import os
 from dotenv import load_dotenv
 
-load_dotenv()
-
-
 # --------------------------------------------------
-# BASE DIR & ENV LOADING
+# BASE DIR & ENV
 # --------------------------------------------------
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-
-# Load .env file
 load_dotenv(BASE_DIR / ".env")
 
 # --------------------------------------------------
-# ENVIRONMENT VARIABLES
+# SECURITY
+# --------------------------------------------------
+
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
+
+if not SECRET_KEY:
+    raise Exception("DJANGO_SECRET_KEY not set in environment")
+
+DEBUG = os.getenv("DJANGO_DEBUG", "0") == "1"
+
+ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
+
+# --------------------------------------------------
+# API KEYS
 # --------------------------------------------------
 
 GITHUB_CLIENT_ID = os.getenv("GITHUB_CLIENT_ID")
@@ -42,32 +49,18 @@ GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
-# Optional safety check (recommended)
-if not GROQ_API_KEY:
-    print("⚠️ WARNING: GROQ_API_KEY not found in .env")
-
-# --------------------------------------------------
-# SECURITY
-# --------------------------------------------------
-SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "@%xir=1m#dkf7vx@c+0x4le-=lpn*!yj#x(#o^1$0o4n#f%si8")
-
-#debug mode should be False in production
-DEBUG = True
-
-ALLOWED_HOSTS = []
-
 # --------------------------------------------------
 # APPLICATIONS
 # --------------------------------------------------
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'core',
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "core",
 ]
 
 # --------------------------------------------------
@@ -75,46 +68,46 @@ INSTALLED_APPS = [
 # --------------------------------------------------
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
 # --------------------------------------------------
 # URLS & TEMPLATES
 # --------------------------------------------------
 
-ROOT_URLCONF = 'config.urls'
+ROOT_URLCONF = "config.urls"
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [BASE_DIR / "templates"],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
             ],
         },
     },
 ]
 
-WSGI_APPLICATION = 'config.wsgi.application'
+WSGI_APPLICATION = "config.wsgi.application"
 
 # --------------------------------------------------
 # DATABASE
 # --------------------------------------------------
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
     }
 }
 
@@ -123,18 +116,18 @@ DATABASES = {
 # --------------------------------------------------
 
 AUTH_PASSWORD_VALIDATORS = [
-    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
+    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
+    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
+    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
+    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
 # --------------------------------------------------
 # INTERNATIONALIZATION
 # --------------------------------------------------
 
-LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'Asia/Kolkata'
+LANGUAGE_CODE = "en-us"
+TIME_ZONE = "Asia/Kolkata"
 USE_I18N = True
 USE_TZ = True
 
@@ -142,8 +135,8 @@ USE_TZ = True
 # STATIC FILES
 # --------------------------------------------------
 
-STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+STATIC_URL = "/static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 STATICFILES_DIRS = [
     BASE_DIR / "static",
@@ -153,14 +146,4 @@ STATICFILES_DIRS = [
 # DEFAULTS
 # --------------------------------------------------
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-
-import os
-
-if os.getenv("AUTO_CREATE_ADMIN") == "1":
-    try:
-        from django.core.management import call_command
-        call_command("initadmin")
-    except Exception as e:
-        print("Admin init skipped:", e)
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
