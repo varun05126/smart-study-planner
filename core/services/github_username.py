@@ -1,25 +1,35 @@
 import requests
+from datetime import datetime, timedelta
 from django.conf import settings
 from django.utils import timezone
+
 from core.models import UserStats
 
-GITHUB_GRAPHQL = "https://api.github.com/graphql"
+# =====================================
+# CONFIG
+# =====================================
 
-# -----------------------------
-# CONFIG (easy to change later)
-# -----------------------------
+GITHUB_GRAPHQL = "https://api.github.com/graphql"
 XP_PER_COMMIT = 10
 XP_PER_LEVEL = 100
 
 
-# --------------------------------
-# Get total public GitHub contributions
-# --------------------------------
+# =====================================
+# GRAPHQL: LAST 1 YEAR CONTRIBUTIONS
+# (matches GitHub profile page)
+# =====================================
+
+GITHUB_GRAPHQL = "https://api.github.com/graphql"
+
+
 def get_total_contributions(username: str) -> int:
+    one_year_ago = (datetime.utcnow() - timedelta(days=365)).isoformat() + "Z"
+    now = datetime.utcnow().isoformat() + "Z"
+
     query = """
-    query($login: String!) {
+    query($login: String!, $from: DateTime!, $to: DateTime!) {
       user(login: $login) {
-        contributionsCollection {
+        contributionsCollection(from: $from, to: $to) {
           contributionCalendar {
             totalContributions
           }
@@ -35,18 +45,20 @@ def get_total_contributions(username: str) -> int:
 
     response = requests.post(
         GITHUB_GRAPHQL,
-        json={"query": query, "variables": {"login": username}},
+        json={
+            "query": query,
+            "variables": {
+                "login": username,
+                "from": one_year_ago,
+                "to": now
+            }
+        },
         headers=headers,
         timeout=20
     )
 
-    if response.status_code != 200:
-        raise Exception("GitHub API request failed")
-
     data = response.json()
-
-    if "errors" in data:
-        raise Exception(data["errors"])
+    print("GITHUB RAW RESPONSE:", data)
 
     user = data.get("data", {}).get("user")
     if not user:
@@ -55,30 +67,35 @@ def get_total_contributions(username: str) -> int:
     return user["contributionsCollection"]["contributionCalendar"]["totalContributions"]
 
 
-# --------------------------------
-# Main sync function
-# --------------------------------
+# =====================================
+# MAIN SYNC FUNCTION
+# =====================================
+
+XP_PER_COMMIT = 10
+XP_PER_LEVEL = 100
+
 def sync_github_by_username(account):
-    # 1. Fetch real total contributions
+
     total_commits = get_total_contributions(account.username)
 
-    # 2. Get or create stats row
     stats, _ = UserStats.objects.get_or_create(user=account.user)
 
-    # 3. Save commits
+    github_xp = total_commits * XP_PER_COMMIT
+
     stats.total_commits = total_commits
+    stats.github_xp = github_xp
 
-    # 4. XP SYSTEM (single source of truth)
-    stats.total_xp = total_commits * XP_PER_COMMIT
+    # 🔗 merge all platforms
+    stats.total_xp = (
+        (stats.github_xp or 0) +
+        (stats.leetcode_xp or 0) +
+        (stats.gfg_xp or 0)
+    )
 
-    # 5. LEVEL SYSTEM
     stats.level = max(1, (stats.total_xp // XP_PER_LEVEL) + 1)
-
-    # 6. Metadata
     stats.last_updated = timezone.now()
     stats.save()
 
-    # 7. Update platform account
     account.last_synced = timezone.now()
     account.save()
 
