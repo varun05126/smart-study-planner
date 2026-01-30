@@ -1,38 +1,79 @@
-from playwright.sync_api import sync_playwright
+from playwright.sync_api import sync_playwright, TimeoutError
 import re
+import logging
+
+logger = logging.getLogger(__name__)
 
 
-def get_gfg_stats(username: str):
-    url = f"https://www.geeksforgeeks.org/profile/{username}?tab=activity"
+def get_gfg_stats(username: str) -> dict:
+    """
+    Fetch GFG stats using Playwright.
+    Returns:
+        {
+            "solved": int,
+            "score": int
+        }
+    Never raises uncaught exceptions (important for Render).
+    """
 
-    with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)   # headless=True for server
-        page = browser.new_page()
-        page.goto(url, timeout=60000)
+    url = f"https://www.geeksforgeeks.org/profile/{username}/"
 
-        page.wait_for_load_state("networkidle")
-        page.wait_for_timeout(8000)  # allow JS to fully render
-
-        text = page.inner_text("body")
-
-        browser.close()
-
-    # -----------------------------
-    # Extract numbers using regex
-    # -----------------------------
     solved = 0
     score = 0
 
-    solved_match = re.search(r"Problems Solved\s+(\d+)", text)
-    score_match = re.search(r"Coding Score\s+(\d+)", text)
+    try:
+        with sync_playwright() as p:
+            browser = p.chromium.launch(
+                headless=True,
+                args=[
+                    "--no-sandbox",
+                    "--disable-dev-shm-usage",
+                    "--disable-gpu",
+                ],
+            )
 
-    if solved_match:
-        solved = int(solved_match.group(1))
+            context = browser.new_context()
+            page = context.new_page()
 
-    if score_match:
-        score = int(score_match.group(1))
+            page.goto(url, timeout=60_000)
+            page.wait_for_load_state("networkidle")
+
+            # Extra wait for React hydration
+            page.wait_for_timeout(5000)
+
+            text = page.inner_text("body")
+
+            browser.close()
+
+        # -----------------------------
+        # Regex extraction (robust)
+        # -----------------------------
+
+        solved_match = re.search(
+            r"Problems\s+Solved\s*[:\-]?\s*(\d+)",
+            text,
+            re.IGNORECASE,
+        )
+
+        score_match = re.search(
+            r"Coding\s+Score\s*[:\-]?\s*(\d+)",
+            text,
+            re.IGNORECASE,
+        )
+
+        if solved_match:
+            solved = int(solved_match.group(1))
+
+        if score_match:
+            score = int(score_match.group(1))
+
+    except TimeoutError:
+        logger.error("GFG Playwright timeout for user=%s", username)
+
+    except Exception as e:
+        logger.exception("GFG Playwright failed for user=%s", username)
 
     return {
         "solved": solved,
-        "score": score
+        "score": score,
     }
