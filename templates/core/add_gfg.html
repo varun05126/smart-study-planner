@@ -52,6 +52,7 @@
   border:1px solid var(--border);
   color:var(--text);
   outline:none;
+  transition:.2s;
 }
 
 .form-group input:focus{
@@ -66,6 +67,47 @@
   margin-top:10px;
 }
 
+/* ---------- PRIMARY BUTTON ---------- */
+.btn-primary{
+  padding:11px 18px;
+  border-radius:12px;
+  border:none;
+  font-weight:800;
+  font-size:14px;
+  cursor:pointer;
+  text-decoration:none;
+  color:#fff;
+  background:linear-gradient(135deg,#6366f1,#4f46e5);
+  box-shadow:0 6px 18px rgba(79,70,229,.35);
+  transition:.2s;
+}
+
+.btn-primary:hover{
+  transform:translateY(-1px);
+  box-shadow:0 10px 24px rgba(79,70,229,.45);
+}
+
+/* ---------- CANCEL BUTTON ---------- */
+.btn-secondary{
+  padding:11px 18px;
+  border-radius:12px;
+  font-weight:800;
+  font-size:14px;
+  cursor:pointer;
+  text-decoration:none;
+  border:1px solid var(--border);
+  background:var(--soft);
+  color:var(--text);
+  transition:.2s;
+}
+
+.btn-secondary:hover{
+  background:var(--card);
+  border-color:#9ca3af;
+  transform:translateY(-1px);
+}
+
+/* ---------- NOTE ---------- */
 .note-box{
   margin-top:18px;
   background:var(--soft);
@@ -100,10 +142,8 @@
     </form>
 
     <div class="note-box">
-      XP system (planned):<br>
-      • 1 problem solved = <b>8 XP</b><br>
-      • Daily activity will affect streaks and charts
-    </div>
+XP = (coding score × <b>10</b>) + (problems solved × <b>5</b>)
+</div>
 
   </div>
 </div>
