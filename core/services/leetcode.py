@@ -21,12 +21,6 @@ def get_leetcode_stats(username: str):
             count
           }
         }
-        profile {
-          ranking
-        }
-        contestBadge {
-          name
-        }
       }
       userContestRanking(username: $username) {
         rating
@@ -55,24 +49,29 @@ def get_leetcode_stats(username: str):
     # -------------------------
     # solved counts
     # -------------------------
-    solved_data = user["submitStatsGlobal"]["acSubmissionNum"]
-
     solved_total = 0
-    for row in solved_data:
-        if row["difficulty"].lower() == "all":
-            solved_total = row["count"]
+    buckets = user.get("submitStatsGlobal", {}).get("acSubmissionNum", [])
+
+    for row in buckets:
+        if row.get("difficulty", "").lower() == "all":
+            solved_total = int(row.get("count", 0))
 
     # -------------------------
     # contest data
     # -------------------------
     contest = data.get("data", {}).get("userContestRanking") or {}
-    rating = contest.get("rating") or 1300
-    contests = contest.get("attendedContestsCount") or 0
+
+    rating = contest.get("rating")
+    contests = contest.get("attendedContestsCount")
+
+    # safe defaults
+    rating = int(rating) if rating else 1300
+    contests = int(contests) if contests else 0
 
     return {
         "solved": solved_total,
-        "rating": int(rating),
-        "contests": int(contests),
+        "rating": rating,
+        "contests": contests,
     }
 
 
@@ -97,12 +96,14 @@ def sync_leetcode_by_username(user):
     contests = data["contests"]
 
     # ---------------------------------
-    # XP FORMULA (your rule)
+    # XP FORMULA (rating model)
     # ---------------------------------
+    rating_delta = max(0, rating - 1300)
+
     xp = (
-        (solved * 10)
-        + int(((rating - 1300) ** 2) / 10)
-        + (contests * 50)
+        (solved * 10) +
+        int((rating_delta ** 2) / 10) +
+        (contests * 50)
     )
 
     stats, _ = UserStats.objects.get_or_create(user=user)
@@ -116,7 +117,7 @@ def sync_leetcode_by_username(user):
     account.last_synced = timezone.now()
     account.save(update_fields=["last_synced"])
 
-    # safe global recalc
+    # ✅ global recompute
     stats.recalculate_totals()
 
     return {
