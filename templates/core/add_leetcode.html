@@ -11,9 +11,26 @@
   border:1px solid var(--border);
   box-shadow:var(--shadow-md);
   text-align:center;
+  animation:fadeIn .35s ease;
 }
-.connect-box h2{margin-bottom:10px}
-.connect-box p{color:var(--muted);font-size:14px}
+
+@keyframes fadeIn{
+  from{opacity:0;transform:translateY(10px)}
+  to{opacity:1;transform:none}
+}
+
+.connect-box h2{
+  margin-bottom:10px;
+  font-weight:900;
+  letter-spacing:-.3px;
+}
+
+.connect-box p{
+  color:var(--muted);
+  font-size:14px;
+  line-height:1.5;
+}
+
 .connect-box input{
   width:100%;
   padding:12px;
@@ -22,10 +39,49 @@
   border:1px solid var(--border);
   background:var(--soft);
   color:inherit;
+  font-size:14px;
+  transition:.2s ease;
 }
-.connect-box button{
+
+.connect-box input:focus{
+  outline:none;
+  border-color:var(--primary);
+  box-shadow:0 0 0 2px rgba(99,102,241,.18);
+}
+
+/* ---------- Buttons layout ---------- */
+.connect-actions{
   margin-top:18px;
-  width:100%;
+  display:flex;
+  gap:12px;
+}
+
+.connect-actions button,
+.connect-actions a{
+  flex:1;
+}
+
+/* ---------- Cancel / Secondary Button ---------- */
+.btn-secondary{
+  display:inline-block;
+  text-align:center;
+  padding:12px 14px;
+  border-radius:10px;
+  border:1px solid var(--border);
+  background:var(--soft);
+  color:var(--text);
+  font-weight:700;
+  font-size:14px;
+  text-decoration:none;
+  cursor:pointer;
+  transition:.2s ease;
+}
+
+.btn-secondary:hover{
+  background:var(--card);
+  border-color:#9ca3af;
+  transform:translateY(-1px);
+  box-shadow:var(--shadow-sm);
 }
 </style>
 
@@ -43,7 +99,10 @@
       required
     >
 
-    <button type="submit" class="btn-primary">Connect</button>
+    <div class="actions">
+        <button type="submit" class="btn-primary">🔗 Connect</button>
+        <a href="{% url 'profile' %}" class="btn-secondary">Cancel</a>
+      </div>
   </form>
 </div>
 
