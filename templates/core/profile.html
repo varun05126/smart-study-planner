@@ -23,10 +23,64 @@
   box-shadow:var(--shadow-md);
 }
 
-.profile-card h2{margin:0 0 14px;font-size:1.25rem;font-weight:800}
+.profile-card h2{
+  margin:0 0 14px;
+  font-size:1.25rem;
+  font-weight:800
+}
+
 .stat{font-size:14px;margin:6px 0}
 .stat b{color:var(--muted)}
-.actions{margin-top:14px;display:flex;gap:10px;flex-wrap:wrap}
+
+.actions{
+  margin-top:14px;
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap
+}
+
+/* ================= BUTTONS ================= */
+
+.btn-primary,
+.btn-danger{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  padding:10px 16px;
+  border-radius:12px;
+  font-size:13px;
+  font-weight:800;
+  text-decoration:none;
+  border:none;
+  cursor:pointer;
+  transition:all .18s ease;
+  box-shadow:var(--shadow-sm);
+}
+
+.btn-primary{
+  background:#6366f1;
+  color:#fff;
+}
+
+.btn-primary:hover{
+  transform:translateY(-1px);
+  opacity:.95;
+}
+
+.btn-danger{
+  background:#7f1d1d;
+  color:#fecaca;
+  border:1px solid #991b1b;
+}
+
+.btn-danger:hover{
+  background:#991b1b;
+  color:#ffffff;
+  transform:translateY(-1px);
+}
+
+/* ================= INFO ================= */
 
 .note-box{
   margin-top:14px;
@@ -36,9 +90,14 @@
   padding:10px;
   font-size:12px;
   color:var(--muted);
+  line-height:1.5;
 }
 
-.big-xp{font-size:2.8rem;font-weight:900;margin:10px 0}
+.big-xp{
+  font-size:2.8rem;
+  font-weight:900;
+  margin:10px 0
+}
 
 .level-badge{
   display:inline-block;
@@ -61,6 +120,7 @@
 .username-link:hover{ text-decoration:underline }
 </style>
 
+
 <div class="profile-wrap">
 
 <div class="profile-head">
@@ -77,15 +137,16 @@
   <div class="big-xp">{{ total_xp }} XP</div>
   <span class="level-badge">Level {{ level }}</span>
 
-  <p class="stat"><b>GitHub commits:</b> {{ github_commits }}</p>
+  <p class="stat"><b>GitHub contributions:</b> {{ github_commits }}</p>
   <p class="stat"><b>LeetCode solved:</b> {{ leetcode_solved }}</p>
   <p class="stat"><b>GFG solved:</b> {{ stats.gfg_solved|default:0 }}</p>
 
   <div class="note-box">
-    ⭐ <b>Level system:</b> Every 100 XP = 1 Level  
-    <br>All platforms contribute to Total XP.
+    ⭐ <b>Level rule:</b> Every 100 XP = 1 Level<br>
+    XP is combined from all connected platforms.
   </div>
 </div>
+
 
 <!-- ================= GITHUB ================= -->
 <div class="profile-card">
@@ -100,7 +161,8 @@
     </a>
   </p>
 
-  <p class="stat"><b>Commits:</b> {{ github_commits }}</p>
+  <p class="stat"><b>Public repos:</b> {{ stats.github_repos }}</p>
+  <p class="stat"><b>Contributions:</b> {{ github_commits }}</p>
   <p class="stat"><b>XP:</b> {{ stats.github_xp }}</p>
   <p class="stat"><b>Last sync:</b> {{ github.last_synced|default:"Never" }}</p>
 
@@ -108,13 +170,18 @@
     <a class="btn-primary" href="{% url 'github_sync' %}">🔄 Sync</a>
     <a class="btn-danger" href="{% url 'disconnect_github' %}">Disconnect</a>
   </div>
+
 {% else %}
   <p class="stat not-connected">Not connected</p>
   <a class="btn-primary" href="{% url 'add_github' %}">➕ Connect</a>
 {% endif %}
 
-<div class="note-box">1 commit = <b>10 XP</b></div>
+<div class="note-box">
+XP = (public repos × <b>15</b>) + (contributions × <b>5</b>)<br>
+Only <b>public repositories</b> are counted.
 </div>
+</div>
+
 
 <!-- ================= LEETCODE ================= -->
 <div class="profile-card">
@@ -137,13 +204,17 @@
     <a class="btn-primary" href="{% url 'leetcode_sync' %}">🔄 Sync</a>
     <a class="btn-danger" href="{% url 'disconnect_leetcode' %}">Disconnect</a>
   </div>
+
 {% else %}
   <p class="stat not-connected">Not connected</p>
   <a class="btn-primary" href="{% url 'add_leetcode' %}">➕ Connect</a>
 {% endif %}
 
-<div class="note-box">Easy = 5 XP • Medium = 10 XP • Hard = 20 XP</div>
+<div class="note-box">
+XP = Easy × <b>5</b> • Medium × <b>10</b> • Hard × <b>20</b>
 </div>
+</div>
+
 
 <!-- ================= GFG ================= -->
 <div class="profile-card">
@@ -166,28 +237,37 @@
     <a class="btn-primary" href="{% url 'gfg_sync' %}">🔄 Sync</a>
     <a class="btn-danger" href="{% url 'disconnect_gfg' %}">Disconnect</a>
   </div>
+
 {% else %}
   <p class="stat not-connected">Not connected</p>
   <a class="btn-primary" href="{% url 'add_gfg' %}">➕ Connect</a>
 {% endif %}
 
-<div class="note-box">1 solved problem = <b>8 XP</b></div>
+<div class="note-box">
+XP = (coding score × <b>10</b>) + (problems solved × <b>5</b>)
+</div>
 </div>
 
-<!-- ================= CODEFORCES ================= -->
+
+<!-- ================= CODECHEF ================= -->
 <div class="profile-card">
-<h2>⚡ Codeforces</h2>
+<h2>🍽️ CodeChef</h2>
 <p class="stat not-connected">Not connected</p>
 <a class="btn-primary">➕ Connect (coming)</a>
-<div class="note-box">Solved × 12 + rating bonus</div>
+<div class="note-box">
+XP = (problems × 2) + rating bonus + contest bonus
 </div>
+</div>
+
 
 <!-- ================= HACKERRANK ================= -->
 <div class="profile-card">
 <h2>🟢 HackerRank</h2>
 <p class="stat not-connected">Not connected</p>
 <a class="btn-primary">➕ Connect (coming)</a>
-<div class="note-box">1 solved challenge = <b>6 XP</b></div>
+<div class="note-box">
+XP = challenges solved × <b>6</b>
+</div>
 </div>
 
 </div>
