@@ -143,4 +143,3 @@ class LeaderboardEntryAdmin(admin.ModelAdmin):
     ordering = ("rank",)
     search_fields = ("user__username",)
     readonly_fields = ("calculated_at",)
-    
